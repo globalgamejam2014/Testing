@@ -1,34 +1,57 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum TouchStyle{
+	Joystick,
+	DPad,
+	DiagonalDPad,
+	Button1,
+	Button2,
+	Button3Up,
+	Button3UpHold
+}
+
 public class PlayerControls : MonoBehaviour {
-	
-	private Vector2 dPadInput = new Vector2(0,0);
-	private Vector3 thisPosition = new Vector3(0,0,0);
-	private CharacterController characterController;
 	
 	// Use this for initialization
 	void Start () {
-		if(networkView.isMine){
-			characterController = GetComponent<CharacterController>();
-			GameObject.Find ("MainCamera").GetComponent<FollowCharacter>().SetCharacterFollow(transform);
-		}
+		SetControls(2,3);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(networkView.isMine){
-			GetInput();
-			SetPosition(thisPosition);
-		}
 	}
 	
 	void GetInput(){
-		dPadInput = new Vector2(DPad.horizontal * 5 + 3, DPad.vertical * 5);
 	}
 	
-	void SetPosition(Vector3 rpcInput){
-		characterController.Move(new Vector3(0, 0, DPad.vertical * 5));
-		transform.Rotate(0, DPad.horizontal, 0);
+	[RPC] void SentJoystick(NetworkPlayer player, float vertical, float horizontal){
+		Debug.Log (vertical.ToString() + ", " + horizontal.ToString());
 	}
+	
+	[RPC] void SentDPad(NetworkPlayer player, float vertical, float horizontal){
+	}
+	
+	[RPC] void SentDiagonalDPad(NetworkPlayer player, float vertical, float horizontal){
+	}
+	
+	[RPC] void SentButton1(NetworkPlayer player, string buttonPress){
+	}
+	
+	[RPC] void SentButton2(NetworkPlayer player, string buttonPress){
+	}
+	
+	[RPC] void SentButton3Up(NetworkPlayer player, string buttonPress){
+	}
+	
+	[RPC] void SentButton3UpHold(NetworkPlayer player, string buttonPress, float holdTime){
+	}
+	
+	[RPC] public void InstantiatePlayerObject(NetworkPlayer player){
+		networkView.RPC ("PlayerObjectCreated", player);
+	}
+	
+	
+	[RPC] public void SetControls(int lControls, int rControls){}
+	[RPC] void PlayerObjectCreated(){}
 }

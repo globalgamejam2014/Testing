@@ -1,8 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/NetworkAndMenu.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerControls.cs">
     <Files>
-      <File FileName="Assets/Scripts/NetworkAndMenu.cs" Line="7" Column="50" />
+      <File FileName="Assets\Scripts\MenuManager.cs" Line="11" Column="7" />
+      <File FileName="Assets\Scripts\NetworkManager.cs" Line="31" Column="46" />
+      <File FileName="Assets\Scripts\PlayerControls.cs" Line="57" Column="35" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
