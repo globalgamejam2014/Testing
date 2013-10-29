@@ -6,6 +6,9 @@ public class MenuManager : MonoBehaviour {
 	static public bool is_menu = true;
 	static public bool is_gameOver = false;
 	static public bool is_credits = false;
+	static public bool is_countdown = false;
+	private int countdownTime = 5;
+	static public float lastTickTime;
 	public Font font;
 	private Transform mainCamera;
 	private string muteText = "Mute";
@@ -16,17 +19,48 @@ public class MenuManager : MonoBehaviour {
 	
 	void OnGUI(){
 		GUI.skin.font = font;
+		if(is_countdown){
+			GUI.skin.box.fontSize = 30;
+			GUI.Box(new Rect(Screen.width - Screen.width/5,0,Screen.width/5,Screen.height/5), "Game Starts In");
+			GUI.skin.box.fontSize = 60;
+			GUI.Box(new Rect(Screen.width - Screen.width/5,Screen.height/5,Screen.width/5,Screen.height/5), countdownTime.ToString());
+			GUI.skin.box.fontSize =15;
+			if(countdownTime < 1){
+				transform.GetComponent<NetworkManager>().StartRound();
+				countdownTime = 5;
+				is_countdown = false;
+				is_menu = false;
+				PlayerControls.is_gameOn = true;
+			}
+			else if(lastTickTime + 1 < Time.time){
+				lastTickTime = Time.time;
+				countdownTime--;
+			}
+		}
 		if(is_menu){
-			if (GUI.Button(WorldRect(new Rect(-13,10,3,1)), "Menu")){
+			GUI.Box(new Rect(Screen.width/2 - Screen.width/5,0,Screen.width/2.5F,Screen.height/5), "Menu");
+			if (GUI.Button(new Rect(Screen.width/2-Screen.width/10,Screen.height/10,Screen.width/5,Screen.height/5), "FullScreen")){
+				Screen.fullScreen = !Screen.fullScreen;
+			}
+			if (GUI.Button(new Rect(Screen.width/2-Screen.width/10,Screen.height/10*4,Screen.width/5,Screen.height/5), "Reload Player")){
+				transform.GetComponent<NetworkManager>().StartDownload("http://beta.catduo.com/tf/WebPlayerBeta.unity3d");
+			}
+			if (GUI.Button(new Rect(0,0,Screen.width/20,Screen.height/20), "Menu")){
 				is_menu = false;
 			}
 		}
-		else{
-			if (GUI.Button(WorldRect(new Rect(-13,10,3,1)), "Menu")){
+		else if(PlayerControls.is_gameOn){
+			if (GUI.Button(new Rect(0,0,Screen.width/20,Screen.height/20), "Menu")){
 				is_menu = true;
 			}
-			GUI.Box(WorldRect(new Rect(-13,9,3,1)), NetworkManager.gameName);
 		}
+		else{
+			GUI.Box(new Rect(Screen.width - Screen.width/5,0,Screen.width/5,Screen.height/5), "Waiting for Players\n" + NetworkManager.playerList.Length.ToString() + " in Lobby");
+			if (GUI.Button(new Rect(0,0,Screen.width/20,Screen.height/20), "Menu")){
+				is_menu = true;
+			}
+		}
+		GUI.Box(new Rect(0,Screen.height/20,Screen.width/20,Screen.height/20), NetworkManager.gameName);
 	}
 		
 	
