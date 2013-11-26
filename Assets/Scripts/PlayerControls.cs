@@ -72,4 +72,5 @@ public class PlayerControls : MonoBehaviour {
 	[RPC] public void SetControls(int lControls, int rControls){}
 	[RPC] void PlayerObjectCreated(){}
 	[RPC] void EndOfRound(int player){}
+	[RPC] void NewGame(){}
 }

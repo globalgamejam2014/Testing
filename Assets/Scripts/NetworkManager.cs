@@ -12,6 +12,10 @@ public class NetworkManager : MonoBehaviour {
 	private WWW wwwData = null;
 	private bool is_thisGameAgain = true;
 	
+	void Awake(){
+		Screen.fullScreen = true;	
+	}
+	
     private void StartServer(){
 		Application.runInBackground = true;
         Network.InitializeServer(32, 25000, !Network.HavePublicAddress());
@@ -49,7 +53,6 @@ public class NetworkManager : MonoBehaviour {
 	
     void OnServerInitialized(){
         Debug.Log("Server Initializied");
-		Screen.fullScreen = true;
     }
 	
 	void OnPlayerDisconnected(NetworkPlayer player){
@@ -129,6 +132,8 @@ public class NetworkManager : MonoBehaviour {
 	}
 	
 	[RPC] public void NewUrl(string url){
+		MenuManager.is_loadingNewGame = true;
+		networkView.RPC("NewGame", RPCMode.Others);
 		StartDownload(url);
 	}
 	

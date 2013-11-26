@@ -7,6 +7,7 @@ public class MenuManager : MonoBehaviour {
 	static public bool is_gameOver = false;
 	static public bool is_credits = false;
 	static public bool is_countdown = false;
+	static public bool is_loadingNewGame = false;
 	private int countdownTime = 5;
 	static public float lastTickTime;
 	public Font font;
@@ -37,13 +38,16 @@ public class MenuManager : MonoBehaviour {
 				countdownTime--;
 			}
 		}
-		if(is_menu){
+		if (is_loadingNewGame){
+			GUI.Box(new Rect(Screen.width - Screen.width/5,0,Screen.width/5,Screen.height/5), "Loading New Game");
+		}
+		else if(is_menu){
 			GUI.Box(new Rect(Screen.width/2 - Screen.width/5,0,Screen.width/2.5F,Screen.height/5), "Menu");
 			if (GUI.Button(new Rect(Screen.width/2-Screen.width/10,Screen.height/10,Screen.width/5,Screen.height/5), "FullScreen")){
 				Screen.fullScreen = !Screen.fullScreen;
 			}
 			if (GUI.Button(new Rect(Screen.width/2-Screen.width/10,Screen.height/10*4,Screen.width/5,Screen.height/5), "Reload Player")){
-				transform.GetComponent<NetworkManager>().StartDownload("http://beta.catduo.com/tf/WebPlayerBeta.unity3d");
+				transform.GetComponent<NetworkManager>().NewUrl("http://beta.catduo.com/tf/WebPlayerBeta.unity3d");
 			}
 			if (GUI.Button(new Rect(0,0,Screen.width/20,Screen.height/20), "Menu")){
 				is_menu = false;
