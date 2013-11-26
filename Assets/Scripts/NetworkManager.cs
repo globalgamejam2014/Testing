@@ -18,8 +18,13 @@ public class NetworkManager : MonoBehaviour {
 	
     private void StartServer(){
 		Application.runInBackground = true;
-        Network.InitializeServer(32, 25000, !Network.HavePublicAddress());
-		Application.ExternalCall("GetGameName");
+        Network.InitializeServer(32, 2500, !Network.HavePublicAddress());
+		if(Application.isWebPlayer){
+			Application.ExternalCall("GetGameName");
+		}
+		else{
+			GetGameName("");
+		}
     }    
 	
 	private IEnumerator WaitForDownload(){
@@ -48,7 +53,9 @@ public class NetworkManager : MonoBehaviour {
         form.AddField("action","create");
         form.AddField ("name",gameName);
         WWW post_req = new WWW("http://localhost/foo.php",form);
-		Application.ExternalCall("SetGameName", gameName);
+		if(Application.isWebPlayer){
+			Application.ExternalCall("SetGameName", gameName);
+		}
 	}
 	
     void OnServerInitialized(){

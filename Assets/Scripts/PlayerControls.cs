@@ -37,8 +37,7 @@ public class PlayerControls : MonoBehaviour {
 	
 	[RPC] void SentJoystick(int player, float vertical, float horizontal){
 		if(is_gameOn){
-			playerObjects[player].GetComponent<Microbe>().movement = new Vector2(horizontal, vertical);
-			Debug.Log (vertical.ToString() + ", " + horizontal.ToString());
+			playerObjects[player].GetComponent<Dragon>().turningAngle = -horizontal;
 		}
 	}
 	
@@ -49,7 +48,9 @@ public class PlayerControls : MonoBehaviour {
 	}
 	
 	[RPC] void SentButton1(int player, string buttonPress){
-		
+		if(is_gameOn){
+			playerObjects[player].GetComponent<Dragon>().is_attacking = true;
+		}
 	}
 	
 	[RPC] void SentButton2(int player, string buttonPress){
@@ -64,7 +65,7 @@ public class PlayerControls : MonoBehaviour {
 	[RPC] public void InstantiatePlayerObject(int player, float primaryR, float primaryG, float primaryB, float secondaryR, float secondaryG, float secondaryB, string playerName){
 		Color primary = new Color(primaryR, primaryG, primaryB, 0.6F);
 		Color secondary = new Color(secondaryR, secondaryG, secondaryB, 1);
-		playerObjects[player].GetComponent<Microbe>().SetMyPlayer(player, primary, secondary, playerName);
+		playerObjects[player].GetComponent<Dragon>().SetMyPlayer(player, primary, secondary, playerName);
 	}
 	
 	
