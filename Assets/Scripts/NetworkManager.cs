@@ -1,29 +1,49 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 using System;
 
 public class NetworkManager : MonoBehaviour {
+	
+	
+	public UdpClient udp;
+	public IPEndPoint endIP;
+	float timer;
+	IPEndPoint groupEP;
+	
 	private const string typeName = "AntiConsole";
 	static public string gameName;
 	static public NetworkPlayer[] playerList = new NetworkPlayer[0];
 	static public bool[] readyList = new bool[0];
+	static public int readyCount = 0;
 	public GameObject playerObject;
 	public static NetworkManager nm;
 	private WWW wwwData = null;
 	private bool is_thisGameAgain = true;
 	
-	void Awake(){
-		Screen.fullScreen = true;	
+	void Update () {
+		if(gameName != null && udp != null){
+			SendMessage(gameName);
+		}
 	}
+	
+	/*void SendMessage(string message){
+		Debug.Log("sending");
+		byte[] messageBytes = System.Text.Encoding.ASCII.GetBytes(message);
+		udp.Send(messageBytes, messageBytes.Length, groupEP);
+		Debug.Log ("sent");
+	}	*/
 	
     private void StartServer(){
 		Application.runInBackground = true;
-        Network.InitializeServer(32, 2500, !Network.HavePublicAddress());
+        Network.InitializeServer(32, 25002, !Network.HavePublicAddress());
 		if(Application.isWebPlayer){
 			Application.ExternalCall("GetGameName");
 		}
 		else{
-			GetGameName("");
+			GetGameName("aaaa");
 		}
     }    
 	
@@ -60,6 +80,10 @@ public class NetworkManager : MonoBehaviour {
 	
     void OnServerInitialized(){
         Debug.Log("Server Initializied");
+		//udp = new UdpClient();
+		//udp.EnableBroadcast = true;
+		//groupEP = new IPEndPoint(IPAddress.Parse("255.255.255.255"), 15000);
+		//IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
     }
 	
 	void OnPlayerDisconnected(NetworkPlayer player){
@@ -79,10 +103,22 @@ public class NetworkManager : MonoBehaviour {
 		playerList = tempPlayerList;
 		readyList = tempReadyList;
 		networkView.RPC ("SetPlayerNumber", player, tempPlayerList.Length - 1);
-		networkView.RPC ("SetControls", player, 0,3);
+		if(PlayerControls.is_gameOn){
+			transform.GetComponent<PlayerControls>().SentBasicButtons("Waiting for round to complete.", player);
+		}
+		else if(MenuManager.is_countdown){
+			transform.GetComponent<PlayerControls>().SentBasicButtons("Join Game", "Cancel Countdown", "Ready to Play?", player);
+		}
+		else{
+			transform.GetComponent<PlayerControls>().SentBasicButtons("Join Game", "Start Game", "Ready to Play?", player);
+		}
 	}
 	
 	public void StartRound(){
+		Transform po = GameObject.Find ("PlayerObjects").transform;
+		for(int i = 0; i < po.childCount; i++){
+			Destroy(po.GetChild(i).gameObject);
+		}
 		int readyPlayers = 0;
 		int thisReadyPlayer = 0;
 		Transform[] tempPlayerObjects = new Transform [playerList.Length];
@@ -93,13 +129,13 @@ public class NetworkManager : MonoBehaviour {
 		}
 		for(int i = 0; i < playerList.Length; i++){
 			if(readyList[i]){
-				GameObject newPlayerObject = (GameObject) GameObject.Instantiate(playerObject, new Vector3(-10,0,0), Quaternion.identity);
+				GameObject newPlayerObject = (GameObject) GameObject.Instantiate(playerObject, new Vector3(0,-4,0), Quaternion.identity);
 				newPlayerObject.transform.RotateAround(Vector3.zero, Vector3.forward, 360 - 360 / readyPlayers * thisReadyPlayer);
 				newPlayerObject.transform.Rotate(new Vector3(0, 0, - 360 + 360 / readyPlayers * thisReadyPlayer));
+				newPlayerObject.transform.parent = GameObject.Find ("PlayerObjects").transform;
 				tempPlayerObjects[i] = newPlayerObject.transform;
 				networkView.RPC ("PlayerObjectCreated", playerList[i]);
 				thisReadyPlayer++;
-				readyList[i] = false;
 			}
 			else{
 				tempPlayerObjects[i] = null;
@@ -108,33 +144,35 @@ public class NetworkManager : MonoBehaviour {
 		PlayerControls.playerObjects = tempPlayerObjects;
 	}
 	
-	[RPC] void PlayerReady(int player){
+	public void PlayerReady(int player){
 		if(!PlayerControls.is_gameOn){
-			Debug.Log ("player" +player.ToString () + " ready");
 			readyList[player] = true;
-			int readyCount = 0;
+			readyCount = 0;
 			for(int i = 0; i < readyList.Length; i++){
 				readyCount++;
 			}
 			//change to other number when ready to play
-			if(readyCount>0 && is_thisGameAgain){
-				MenuManager.lastTickTime = Time.time + 1;
-				MenuManager.is_countdown = true;
-			}
+			StartRound();
 		}
 	}
 	
-	[RPC] public void EndRound(){
+	public void EndRound(){
+		Transform po = GameObject.Find ("PlayerObjects").transform;
+		for(int i = 0; i < po.childCount; i++){
+			Destroy(po.GetChild(i).gameObject);
+		}
+		Transform mo = GameObject.Find ("Modifiers").transform;
+		for(int i = 0; i < mo.childCount; i++){
+			Destroy(mo.GetChild(i).gameObject);
+		}
 		PlayerControls.is_gameOn = false;
 		is_thisGameAgain = false;
-		networkView.RPC ("EndOfRound", RPCMode.Others, PlayerControls.controllingPlayer);
-		PlayerControls.controllingPlayer++;
-		if(PlayerControls.controllingPlayer >= playerList.Length){
-			PlayerControls.controllingPlayer = 0;
+		for(int i = 0; i < playerList.Length; i++){
+			transform.GetComponent<PlayerControls>().SentBasicButtons("Play Again!", "Play a Different Game", "Would you like to play this game again?", playerList[i]);
 		}
 	}
 	
-	[RPC] public void ReplayThisGame(){
+	public void ReplayThisGame(){
 		is_thisGameAgain = true;
 	}
 	
@@ -152,5 +190,9 @@ public class NetworkManager : MonoBehaviour {
 		//Network.natFacilitatorPort = 23466;
 		Application.targetFrameRate = 24;
 		StartServer();
+	}
+	
+	void OnApplicationQuit(){
+		Network.Disconnect();
 	}
 }
