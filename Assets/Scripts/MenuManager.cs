@@ -8,14 +8,16 @@ public class MenuManager : MonoBehaviour {
 	static public bool is_credits = false;
 	static public bool is_countdown = false;
 	static public bool is_loadingNewGame = false;
+	static public bool is_choosingArena = true;
 	static public int countdownTime = 3;
-	static public int timer = 0;
+	static public int timer = countdownTime;
 	static public float lastTickTime;
 	public Font font;
 	private Transform mainCamera;
 	private string muteText = "Mute";
+	public static int[] score;
 	
-	static public int roundDuration = 60;
+	static public int roundDuration = 180;
 	private float roundStart;
 	private bool is_roundStarted = false;
 	
@@ -31,10 +33,13 @@ public class MenuManager : MonoBehaviour {
 		GUI.skin.button.fontSize = Mathf.RoundToInt((Camera.main.WorldToScreenPoint(new Vector2(1,1)).x-Camera.main.WorldToScreenPoint(new Vector2(0,0)).x)*0.7F);
 		GUI.skin.textArea.fontSize = Mathf.RoundToInt((Camera.main.WorldToScreenPoint(new Vector2(1,1)).x-Camera.main.WorldToScreenPoint(new Vector2(0,0)).x)*0.7F);
 		GUI.skin.textField.fontSize = Mathf.RoundToInt((Camera.main.WorldToScreenPoint(new Vector2(1,1)).x-Camera.main.WorldToScreenPoint(new Vector2(0,0)).x)*0.7F);
-		if(is_countdown){
+		if(is_choosingArena){
+			GUI.Box(new Rect(Screen.width - Screen.width/2.5F,0,Screen.width/5,Screen.height/5), "Choose Arena");
+		}
+		else if(is_countdown){
 			GUI.Box(new Rect(Screen.width - Screen.width/2.5F,0,Screen.width/5,Screen.height/5), "Game Starts In");
 			GUI.skin.box.fontSize *= 2;
-			GUI.Box(new Rect(Screen.width - Screen.width/2.5F,Screen.height/5,Screen.width/5,Screen.height/5), countdownTime.ToString());
+			GUI.Box(new Rect(Screen.width - Screen.width/2.5F,Screen.height/5,Screen.width/5,Screen.height/5), timer.ToString());
 			GUI.skin.box.fontSize /= 2;
 			if(timer < 1){
 				transform.GetComponent<NetworkManager>().StartRound();
@@ -44,13 +49,17 @@ public class MenuManager : MonoBehaviour {
 				PlayerControls.is_gameOn = true;
 				for(int i = 0; i < NetworkManager.readyList.Length; i++){
 					if(NetworkManager.readyList[i]){
-						networkView.RPC ("SetControls", NetworkManager.playerList[i], 0,0);
+						PlayerControls.statusObjects[i].GetComponent<Status>().status.text = "0";
+						PlayerControls.statusObjects[i].GetComponent<Status>().status.color = Color.black;
+						networkView.RPC ("SetControls", NetworkManager.playerList[i], 0, "Move Character",0, "Move for Direction\nRelease to Fire");
 					}
 					else{
 						transform.GetComponent<PlayerControls>().SentBasicButtons("Waiting for round to complete.", NetworkManager.playerList[i]);
 					}
 					NetworkManager.readyList[i] = false;
 				}
+				score = new int[NetworkManager.playerList.Length];
+				Debug.Log(score[0]);
 			}
 			else if(lastTickTime + 1 < Time.time){
 				lastTickTime = Time.time;
@@ -84,13 +93,14 @@ public class MenuManager : MonoBehaviour {
 			}
 			GUI.Box(new Rect(Screen.width - Screen.width/5,0,Screen.width/5,Screen.height/5), "Time Remaining");
 			GUI.skin.box.fontSize *= 2;
-			GUI.Box(new Rect(Screen.width - Screen.width/5,Screen.height/5,Screen.width/5,Screen.height/5), roundDuration.ToString());
+			GUI.Box(new Rect(Screen.width - Screen.width/5,Screen.height/5,Screen.width/5,Screen.height/5), timer.ToString());
 			GUI.skin.box.fontSize /= 2;
 			if(timer < 1){
 				transform.GetComponent<NetworkManager>().EndRound();
 				timer = countdownTime;
 				PlayerControls.is_gameOn = false;
 				is_menu = true;
+				is_choosingArena = true;
 			}
 			else if(lastTickTime + 1 < Time.time){
 				lastTickTime = Time.time;
