@@ -29,6 +29,9 @@ public class PlayerControls : MonoBehaviour {
 		if(is_gameOn || MenuManager.is_choosingArena){
 			if(side == "left" && playerObjects[player] != null){
 				playerObjects[player].GetComponent<Sumo>().movement = new Vector2(horizontal, vertical);
+				if(MenuManager.is_choosingArena){
+					playerObjects[player].GetComponent<Sumo>().facing = new Vector2(horizontal, vertical);
+				}
 			}
 			if(side == "right" && playerObjects[player] != null){
 				playerObjects[player].GetComponent<Sumo>().facing = new Vector2(horizontal, vertical);

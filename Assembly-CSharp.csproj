@@ -50,6 +50,8 @@
      <Compile Include="Assets\Scripts\MenuManager.cs" />
      <Compile Include="Assets\Scripts\NetworkManager.cs" />
      <Compile Include="Assets\Scripts\PlayerControls.cs" />
+     <Compile Include="Assets\Scripts\Projectile.cs" />
+     <Compile Include="Assets\Scripts\Star.cs" />
      <Compile Include="Assets\Scripts\Status.cs" />
      <Compile Include="Assets\Scripts\Sumo.cs" />
      <Compile Include="Assets\Scripts\SumoCollision.cs" />

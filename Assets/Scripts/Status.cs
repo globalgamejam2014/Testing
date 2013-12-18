@@ -13,12 +13,10 @@ public class Status : MonoBehaviour {
 	
 		
 	private Transform body;
-	private Transform hand;
 
 	// Use this for initialization
 	void Start () {
-		body = transform.FindChild("Body");
-		hand = transform.FindChild("Hand");
+		body = transform.FindChild("Robot1");
 		status = transform.FindChild("Status").GetComponent<TextMesh>();
 		status.color = Color.red;
 		status.text = "X";
@@ -36,8 +34,7 @@ public class Status : MonoBehaviour {
 		else{
 			playerCharacter = "";
 		}
-		body.renderer.material.color = primary;
-		hand.renderer.material.color = primary;
+		body.FindChild("Sphere").renderer.material.color = primary;
 		body.FindChild("Character").GetComponent<TextMesh>().color = secondary;
 		body.FindChild("Character").GetComponent<TextMesh>().text = playerCharacter;
 	}

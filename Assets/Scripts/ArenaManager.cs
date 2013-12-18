@@ -16,7 +16,7 @@ public class ArenaManager : MonoBehaviour {
 	void Update () {
 		if(bonusSpawnTimer + 8 < Time.time){
 			bonusSpawnTimer = Time.time;
-			bonusSpawners.GetChild(Mathf.FloorToInt(bonusSpawners.childCount * Random.value)).GetComponent<BonusSpawner>().bonusType = (BonusType)Mathf.FloorToInt(Random.value * 5);
+			bonusSpawners.GetChild(Mathf.FloorToInt(bonusSpawners.childCount * Random.value)).FindChild("BonusSpawner").GetComponent<BonusSpawner>().bonusType = (BonusType)Mathf.FloorToInt(Random.value * 5);
 		}
 	}
 }

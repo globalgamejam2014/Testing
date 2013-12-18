@@ -30,9 +30,13 @@ public class Sumo : MonoBehaviour {
 	public bool is_boostActive = false;
 	public float boostStart;
 	public float boostDuration = 10;
+	public Color flashColor = Color.clear;
 	
 	private Transform body;
+	private Transform robot;
 	private Transform hand;
+	public GameObject projectile;
+	private Transform modifiers;
 	
 	private float flashTime = 0.1F;
 	private bool flash = false;
@@ -40,18 +44,23 @@ public class Sumo : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		body = transform.FindChild("Body");
+		robot = body.FindChild("Robot1").FindChild("Sphere");
+		modifiers = transform.FindChild("Modifiers");
 		hand = transform.FindChild("Hand");
+		hand.GetComponent<Projectile>().playerNumber = playerNumber;
 		speed = 1;
 	}
 	
 	void Update () {
 		if(MenuManager.is_choosingArena){
-			hand.renderer.enabled = false;
+			hand.particleSystem.enableEmission = false;
 			hand.collider.enabled = false;
+			hand.renderer.enabled = false;
 		}
 		else{
-			hand.renderer.enabled = true;
+			hand.particleSystem.enableEmission = true;
 			hand.collider.enabled = true;
+			hand.renderer.enabled = true;
 		}
 		if(is_boostActive){
 			switch(activeBoost){
@@ -60,26 +69,11 @@ public class Sumo : MonoBehaviour {
 				range = 1;
 				strength = 1;
 				defense = 1;
-				hand.renderer.enabled = true;
+				flashColor = Color.yellow;
+				body.transform.name = "Body";
+				hand.particleSystem.enableEmission = true;
 				hand.collider.enabled = true;
-				if(flashTime + 0.2F < Time.time){
-					flashTime = Time.time;
-					flash = !flash;
-				}
-				if(flash){
-					body.renderer.material.color = primary;
-					hand.renderer.material.color = primary;
-				}
-				else{
-					body.renderer.material.color = Color.yellow;
-					hand.renderer.material.color = Color.yellow;
-				}
-				if(boostStart + boostDuration < Time.time){
-					speed = 1;
-					is_boostActive = false;
-					body.renderer.material.color = primary;
-					hand.renderer.material.color = primary;
-				}
+				hand.renderer.enabled = true;
 				break;
 			
 			case BonusType.Immunity:
@@ -87,57 +81,22 @@ public class Sumo : MonoBehaviour {
 				range = 1;
 				strength = 1;
 				speed = 1;
-				hand.renderer.enabled = true;
+				flashColor = Color.white;
+				body.transform.name = "Body";
+				hand.particleSystem.enableEmission = true;
 				hand.collider.enabled = true;
-				if(flashTime + 0.2F < Time.time){
-					flashTime = Time.time;
-					flash = !flash;
-				}
-				if(flash){
-					body.renderer.material.color = primary;
-					hand.renderer.material.color = primary;
-				}
-				else{
-					body.renderer.material.color = Color.white;
-					hand.renderer.material.color = Color.white;
-				}
-				if(boostStart + boostDuration < Time.time){
-					defense = 1;
-					is_boostActive = false;
-					body.renderer.material.color = primary;
-					hand.renderer.material.color = primary;
-				}
+				hand.renderer.enabled = true;
 				break;
 			
 			case BonusType.Rampage:
 				defense = 3;
 				speed = 1.2F;
-				hand.renderer.enabled = false;
+				hand.particleSystem.enableEmission = false;
 				hand.collider.enabled = false;
-				body.transform.name = "Hand";
+				hand.renderer.enabled = false;
+				body.transform.name = "Rampage";
 				range = 1;
-				if(flashTime + 0.2F < Time.time){
-					flashTime = Time.time;
-					flash = !flash;
-				}
-				if(flash){
-					body.renderer.material.color = primary;
-					hand.renderer.material.color = primary;
-				}
-				else{
-					body.renderer.material.color = Color.red;
-					hand.renderer.material.color = Color.red;
-				}
-				if(boostStart + boostDuration < Time.time){
-					defense = 1;
-					speed = 1;
-					is_boostActive = false;
-					hand.renderer.enabled = true;
-					hand.collider.enabled = true;
-					body.transform.name = "Body";
-					body.renderer.material.color = primary;
-					hand.renderer.material.color = primary;
-				}
+				flashColor = Color.red;
 				break;
 			
 			case BonusType.Strength:
@@ -145,26 +104,11 @@ public class Sumo : MonoBehaviour {
 				range = 1;
 				defense = 1;
 				speed = 1;
+				hand.particleSystem.enableEmission = true;
 				hand.renderer.enabled = true;
 				hand.collider.enabled = true;
-				if(flashTime + 0.2F < Time.time){
-					flashTime = Time.time;
-					flash = !flash;
-				}
-				if(flash){
-					body.renderer.material.color = primary;
-					hand.renderer.material.color = primary;
-				}
-				else{
-					body.renderer.material.color = Color.green;
-					hand.renderer.material.color = Color.green;
-				}
-				if(boostStart + boostDuration < Time.time){
-					strength = 1;
-					is_boostActive = false;
-					body.renderer.material.color = primary;
-					hand.renderer.material.color = primary;
-				}
+				flashColor = Color.green;
+				body.transform.name = "Body";
 				break;
 			
 			case BonusType.Range:
@@ -172,27 +116,34 @@ public class Sumo : MonoBehaviour {
 				strength = 1;
 				defense = 1;
 				speed = 1;
+				hand.particleSystem.enableEmission = true;
+				hand.collider.enabled = true;
+				hand.renderer.enabled = true;
+				flashColor = Color.blue;
+				body.transform.name = "Body";
+				break;
+			}
+			if(flashTime + 0.2F < Time.time){
+				flashTime = Time.time;
+				flash = !flash;
+			}
+			if(flash){
+				robot.renderer.material.color = primary;
+			}
+			else{
+				robot.renderer.material.color = flashColor;
+			}
+			if(boostStart + boostDuration < Time.time){
+				defense = 1;
+				speed = 1;
+				range = 1;
+				strength = 1;
+				is_boostActive = false;
+				hand.particleSystem.renderer.enabled = true;
 				hand.renderer.enabled = true;
 				hand.collider.enabled = true;
-				if(flashTime + 0.2F < Time.time){
-					flashTime = Time.time;
-					flash = !flash;
-				}
-				if(flash){
-					body.renderer.material.color = primary;
-					hand.renderer.material.color = primary;
-				}
-				else{
-					body.renderer.material.color = Color.blue;
-					hand.renderer.material.color = Color.blue;
-				}
-				if(boostStart + boostDuration < Time.time){
-					range = 1;
-					is_boostActive = false;
-					body.renderer.material.color = primary;
-					hand.renderer.material.color = primary;
-				}
-				break;
+				body.transform.name = "Body";
+				robot.renderer.material.color = primary;
 			}
 		}
 	}
@@ -220,25 +171,32 @@ public class Sumo : MonoBehaviour {
 			else if(attackPower > 0 && !is_attacking){
 				Attack();
 			}
-			transform.Translate( new Vector3(speed * movement.y/5, speed * movement.x/5, 0));
+			transform.Translate( new Vector3(speed * movement.y/10, speed * movement.x/10, 0));
 			body.rigidbody.angularVelocity = Vector3.zero;
 			float handScale = Mathf.Min (0.5F * strength, (0.4F * attackPower / attackMax + 0.2F) * strength);
 			hand.localScale = new Vector3(handScale, handScale, handScale);
+			hand.particleSystem.startSize = handScale/3;
+			hand.particleSystem.startLifetime = handScale/3;
 			if(is_attacking){
-				if(attackTime + attackDuration/2 > Time.time){
-					hand.localPosition += body.up /2 * range;
-				}
-				else if (attackTime + attackDuration > Time.time){
-					attackPower /= 2;
-					hand.localPosition -= body.up /2 * range;
-				}
-				else{
-					is_attacking = false;
-					attackPower = 0;
-				}
+				hand.GetComponent<Projectile>().facing = body.up;
+				hand.GetComponent<Projectile>().fireDuration = range;
+				is_attacking = false;
+				attackPower = 0;
+				hand.rigidbody.useGravity = true;
+				hand.parent = modifiers;
+				attackPower = 0;
+				handScale = Mathf.Min (0.5F * strength, (0.4F * attackPower / attackMax + 0.2F) * strength);
+				GameObject newHand = (GameObject) GameObject.Instantiate(projectile, body.up + body.position, Quaternion.identity);
+				hand = newHand.transform;
+				hand.GetComponent<Projectile>().playerNumber = playerNumber;
+				hand.name = "Hand";
+				hand.parent = transform;
+				hand.localScale = new Vector3(handScale, handScale, handScale);
+				hand.particleSystem.startSize = handScale/3;
+				hand.particleSystem.startLifetime = handScale/3;
 			}
 			else{
-				hand.position = body.up + body.position;
+				hand.position = body.up  + body.position;
 			}
 		}
 		else{
@@ -259,8 +217,7 @@ public class Sumo : MonoBehaviour {
 		else{
 			playerCharacter = "";
 		}
-		body.renderer.material.color = primary;
-		hand.renderer.material.color = primary;
+		robot.renderer.material.color = primary;
 		body.FindChild("Character").GetComponent<TextMesh>().color = secondary;
 		body.FindChild("Character").GetComponent<TextMesh>().text = playerCharacter;
 	}

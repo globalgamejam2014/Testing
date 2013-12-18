@@ -71,7 +71,7 @@ public class NetworkManager : MonoBehaviour {
 	
     private void StartServer(){
 		Application.runInBackground = true;
-        Network.InitializeServer(32, 25000, !Network.HavePublicAddress());
+        Network.InitializeServer(32, 25001, !Network.HavePublicAddress());
 		if(Application.isWebPlayer){
 			Application.ExternalCall("GetGameName");
 		}
@@ -136,9 +136,9 @@ public class NetworkManager : MonoBehaviour {
 		tempPlayerList[playerList.Length] = player;
 		playerList = tempPlayerList;
 		readyList = tempReadyList;
-		GameObject newPlayerObject = (GameObject) GameObject.Instantiate(statusObject, new Vector3(0,-4,0), Quaternion.identity);
+		GameObject newPlayerObject = (GameObject) GameObject.Instantiate(statusObject, Vector3.zero, Quaternion.identity);
 		newPlayerObject.transform.parent = GameObject.Find ("PlayerStatus").transform;
-		newPlayerObject.transform.localPosition = new Vector3(-10 + playerList.Length, 0, 0);
+		newPlayerObject.transform.localPosition = new Vector3(-5.5F + playerList.Length, -1.75F, 0);
 		newPlayerObject.transform.localRotation = Quaternion.identity;
 		Transform[] tempStatusObjects = new Transform [playerList.Length];
 		for(int i = 0; i < playerList.Length - 1; i++){
