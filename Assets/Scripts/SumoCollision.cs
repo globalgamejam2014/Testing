@@ -8,6 +8,11 @@ public class SumoCollision : MonoBehaviour {
 	private float ringOutDuration = 1.5F;
 	public bool is_ringOut = false;
 	public Vector3 startPosition;
+	public int playerNumber;
+	
+	void Start(){
+		playerNumber = transform.parent.GetComponent<Sumo>().playerNumber;
+	}
 	
 	void Update(){
 		if(is_ringOut){
@@ -28,23 +33,23 @@ public class SumoCollision : MonoBehaviour {
 		switch(collision.transform.name){
 		case "Arena1Platform":
 			collision.transform.renderer.enabled = true;
-			transform.parent.GetComponent<Sumo>().selectedArena = "Arena1";
+			Jovios.players[playerNumber].statusObject.GetComponent<Status>().chosenArena = 1;
 			break;
 		case "Arena2Platform":
 			collision.transform.renderer.enabled = true;
-			transform.parent.GetComponent<Sumo>().selectedArena = "Arena2";
+			Jovios.players[playerNumber].statusObject.GetComponent<Status>().chosenArena = 2;
 			break;
 		case "Arena3Platform":
 			collision.transform.renderer.enabled = true;
-			transform.parent.GetComponent<Sumo>().selectedArena = "Arena3";
+			Jovios.players[playerNumber].statusObject.GetComponent<Status>().chosenArena = 3;
 			break;
 		case "Arena4Platform":
 			collision.transform.renderer.enabled = true;
-			transform.parent.GetComponent<Sumo>().selectedArena = "Arena4";
+			Jovios.players[playerNumber].statusObject.GetComponent<Status>().chosenArena = 4;
 			break;
 		case "Platform":
-			collision.transform.renderer.enabled = true;
-			transform.parent.GetComponent<Sumo>().selectedArena = "";
+			//collision.transform.renderer.enabled = true;
+			Jovios.players[playerNumber].statusObject.GetComponent<Status>().chosenArena = 0;
 			break;
 		case "Rampage":
 			lastPlayerHit = collision.transform.parent.GetComponent<Sumo>().playerNumber;
@@ -62,33 +67,6 @@ public class SumoCollision : MonoBehaviour {
 					Destroy(collision.gameObject);
 				}
 			}
-			break;
-		default:
-			break;
-		}
-	}
-	
-	void OnCollisionStay(Collision collision){
-		switch(collision.transform.name){
-		case "Arena1Platform":
-			collision.transform.renderer.material.color = Color.green;
-			transform.parent.GetComponent<Sumo>().selectedArena = "Arena1";
-			break;
-		case "Arena2Platform":
-			collision.transform.renderer.material.color = Color.green;
-			transform.parent.GetComponent<Sumo>().selectedArena = "Arena2";
-			break;
-		case "Arena3Platform":
-			collision.transform.renderer.material.color = Color.green;
-			transform.parent.GetComponent<Sumo>().selectedArena = "Arena3";
-			break;
-		case "Arena4Platform":
-			collision.transform.renderer.material.color = Color.green;
-			transform.parent.GetComponent<Sumo>().selectedArena = "Arena4";
-			break;
-		case "Platform":
-			collision.transform.renderer.material.color = Color.green;
-			transform.parent.GetComponent<Sumo>().selectedArena = "";
 			break;
 		default:
 			break;
@@ -118,10 +96,10 @@ public class SumoCollision : MonoBehaviour {
 		if(transform.parent != other.transform.parent){
 			switch(other.transform.name){
 			case "Bounds":
-				if(MenuManager.is_choosingArena){
-					PlayerControls.statusObjects[transform.parent.GetComponent<Sumo>().playerNumber].GetComponent<Status>().status.text = "X";
-					PlayerControls.statusObjects[transform.parent.GetComponent<Sumo>().playerNumber].GetComponent<Status>().status.color = Color.red;
-					Camera.main.GetComponent<PlayerControls>().SentBasicButtons("Join Game", "Ready to Play?", NetworkManager.playerList[transform.parent.GetComponent<Sumo>().playerNumber]);
+				if(MenuManager.gameState == GameState.ChooseArena){
+					Jovios.players[playerNumber].statusObject.GetComponent<Status>().xMark.renderer.enabled = true;
+					Jovios.players[playerNumber].statusObject.GetComponent<Status>().checkMark.renderer.enabled = false;
+					Jovios.SentBasicButtons("Join Game", "Ready to Play?", Jovios.players[playerNumber].networkPlayer);
 					Destroy(transform.parent.gameObject);
 				}
 				is_ringOut = true;
@@ -129,8 +107,13 @@ public class SumoCollision : MonoBehaviour {
 				rigidbody.velocity = new Vector3(rigidbody.velocity.x/4, rigidbody.velocity.y/4,0);
 				transform.parent.GetComponent<Sumo>().attackPower = 0;
 				if(lastPlayerHit > -1){
-					MenuManager.score[lastPlayerHit]++;
-					PlayerControls.statusObjects[lastPlayerHit].GetComponent<Status>().status.text = MenuManager.score[lastPlayerHit].ToString();
+					GameManager.score[lastPlayerHit]++;
+					if(GameManager.score[lastPlayerHit] >= GameManager.score[GameManager.winner]){
+						Jovios.players[GameManager.winner].statusObject.GetComponent<Status>().crown.renderer.enabled = false;
+						GameManager.winner = lastPlayerHit;
+						Jovios.players[GameManager.winner].statusObject.GetComponent<Status>().crown.renderer.enabled = true;
+					}
+					Jovios.players[lastPlayerHit].statusObject.GetComponent<Status>().score.text = GameManager.score[lastPlayerHit].ToString();
 					lastPlayerHit = -1;
 				}
 				break;
@@ -141,7 +124,7 @@ public class SumoCollision : MonoBehaviour {
 				transform.parent.GetComponent<Sumo>().is_boostActive = true;
 				transform.parent.GetComponent<Sumo>().activeBoost = other.transform.parent.GetComponent<BonusSpawner>().bonusType;
 				transform.parent.GetComponent<Sumo>().boostStart = Time.time;
-				transform.parent.GetComponent<Sumo>().boostDuration = 10;
+				transform.parent.GetComponent<Sumo>().boostDuration = 5;
 				other.transform.parent.GetComponent<BonusSpawner>().bonusType = BonusType.None;
 				break;
 			}

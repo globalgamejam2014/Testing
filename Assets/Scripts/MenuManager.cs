@@ -1,27 +1,34 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum GameState{
+	GameOn,
+	ChooseArena,
+	Menu,
+	Countdown,
+	GameEnd
+}
+
 public class MenuManager : MonoBehaviour {
 	
-	static public bool is_menu = true;
-	static public bool is_gameOver = false;
+	public static GameState gameState = GameState.ChooseArena;
+	public static GameState previousGameState = GameState.Menu;
 	static public bool is_credits = false;
-	static public bool is_countdown = false;
 	static public bool is_loadingNewGame = false;
-	static public bool is_choosingArena = true;
 	static public int countdownTime = 3;
 	static public int timer = countdownTime;
 	static public float lastTickTime;
 	public Font font;
 	private Transform mainCamera;
 	private string muteText = "Mute";
-	public static int[] score;
 	
 	static public int roundDuration = 180;
 	private float roundStart;
+	
 	private bool is_roundStarted = false;
 	
 	void Start(){
+		iPhoneSettings.screenCanDarken = false;
 		mainCamera = GameObject.Find ("MainCamera").transform;
 	}
 	
@@ -33,45 +40,8 @@ public class MenuManager : MonoBehaviour {
 		GUI.skin.button.fontSize = Mathf.RoundToInt((Camera.main.WorldToScreenPoint(new Vector2(1,1)).x-Camera.main.WorldToScreenPoint(new Vector2(0,0)).x)*0.7F);
 		GUI.skin.textArea.fontSize = Mathf.RoundToInt((Camera.main.WorldToScreenPoint(new Vector2(1,1)).x-Camera.main.WorldToScreenPoint(new Vector2(0,0)).x)*0.7F);
 		GUI.skin.textField.fontSize = Mathf.RoundToInt((Camera.main.WorldToScreenPoint(new Vector2(1,1)).x-Camera.main.WorldToScreenPoint(new Vector2(0,0)).x)*0.7F);
-		if(is_choosingArena){
-			GUI.Box(new Rect(Screen.width - Screen.width/2.5F,0,Screen.width/5,Screen.height/5), "Choose Arena");
-		}
-		else if(is_countdown){
-			GUI.Box(new Rect(Screen.width - Screen.width/2.5F,0,Screen.width/5,Screen.height/5), "Game Starts In");
-			GUI.skin.box.fontSize *= 2;
-			GUI.Box(new Rect(Screen.width - Screen.width/2.5F,Screen.height/5,Screen.width/5,Screen.height/5), timer.ToString());
-			GUI.skin.box.fontSize /= 2;
-			if(timer < 1){
-				transform.GetComponent<NetworkManager>().StartRound();
-				timer = roundDuration;
-				is_countdown = false;
-				is_menu = false;
-				PlayerControls.is_gameOn = true;
-				for(int i = 0; i < NetworkManager.readyList.Length; i++){
-					if(NetworkManager.readyList[i]){
-						PlayerControls.statusObjects[i].GetComponent<Status>().status.text = "0";
-						PlayerControls.statusObjects[i].GetComponent<Status>().status.color = Color.black;
-						networkView.RPC ("SetControls", NetworkManager.playerList[i], 0, "Move Character",0, "Move for Direction\nRelease to Fire");
-					}
-					else{
-						transform.GetComponent<PlayerControls>().SentBasicButtons("Waiting for round to complete.", NetworkManager.playerList[i]);
-					}
-					NetworkManager.readyList[i] = false;
-				}
-				score = new int[NetworkManager.playerList.Length];
-				Debug.Log(score[0]);
-			}
-			else if(lastTickTime + 1 < Time.time){
-				lastTickTime = Time.time;
-				timer--;
-			}
-		}
-		if (is_loadingNewGame){
-			GUI.Box(new Rect(Screen.width - Screen.width/5,0,Screen.width/5,Screen.height/5), "Loading New Game");
-		}
-		else if(is_menu){
-			GUI.Box(new Rect(Screen.width - Screen.width/5,0,Screen.width/5,Screen.height/5), "Waiting for Players\n" + NetworkManager.playerList.Length.ToString() + " in Lobby");
-			GUI.Box(new Rect(Screen.width - Screen.width/5,Screen.height/5,Screen.width/5,Screen.height/5), "Players\n" + NetworkManager.readyCount.ToString() + " Ready");
+		switch(gameState){
+		case GameState.Menu:
 			GUI.Box(new Rect(Screen.width/2 - Screen.width/5,0,Screen.width/2.5F,Screen.height/20), "Menu");
 			if(!Screen.fullScreen){
 				if (GUI.Button(new Rect(Screen.width/2-Screen.width/10,Screen.height/10,Screen.width/5,Screen.height/5), "FullScreen")){
@@ -80,27 +50,64 @@ public class MenuManager : MonoBehaviour {
 			}
 			if(Application.isWebPlayer){
 				if (GUI.Button(new Rect(Screen.width/2-Screen.width/10,Screen.height/10*4,Screen.width/5,Screen.height/5), "Reload Player")){
-					transform.GetComponent<NetworkManager>().NewUrl(Application.absoluteURL);
+					Jovios.NewUrl(Application.absoluteURL);
 				}
 			}
-			if (GUI.Button(new Rect(0,0,Screen.width/10,Screen.height/20), "Menu")){
-				is_menu = false;
+			if (GUI.Button(new Rect(Screen.width/2-Screen.width/20,Screen.height - Screen.height/20,Screen.width/10,Screen.height/20), "Menu")){
+				gameState = previousGameState;
 			}
-		}
-		else if(PlayerControls.is_gameOn){
-			if (GUI.Button(new Rect(0,0,Screen.width/10,Screen.height/20), "Menu")){
-				is_menu = true;
+			break;
+			
+			
+		case GameState.ChooseArena:
+			GUI.Box(new Rect(Screen.width - Screen.width/2.5F,0,Screen.width/5,Screen.height/5), "Choose Arena");
+			if (GUI.Button(new Rect(Screen.width/2-Screen.width/20,Screen.height - Screen.height/20,Screen.width/10,Screen.height/20), "Menu")){
+				gameState = GameState.Menu;
+				previousGameState = GameState.ChooseArena;
 			}
+			break;
+			
+			
+		case GameState.Countdown:
+			GUI.Box(new Rect(Screen.width - Screen.width/2.5F,0,Screen.width/5,Screen.height/5), "Game Starts In");
+			GUI.skin.box.fontSize *= 2;
+			GUI.Box(new Rect(Screen.width - Screen.width/2.5F,Screen.height/5,Screen.width/5,Screen.height/5), timer.ToString());
+			GUI.skin.box.fontSize /= 2;
+			if(timer < 1){
+				GameManager.StartRound();
+				timer = roundDuration;
+				gameState = GameState.GameOn;
+			}
+			else if(lastTickTime + 1 < Time.time){
+				lastTickTime = Time.time;
+				timer--;
+			}
+			if (GUI.Button(new Rect(Screen.width/2-Screen.width/20,Screen.height - Screen.height/20,Screen.width/10,Screen.height/20), "Menu")){
+				gameState = GameState.Menu;
+				previousGameState = GameState.Countdown;
+			}
+			break;
+			
+			
+		case GameState.GameOn:
 			GUI.Box(new Rect(Screen.width - Screen.width/5,0,Screen.width/5,Screen.height/5), "Time Remaining");
 			GUI.skin.box.fontSize *= 2;
 			GUI.Box(new Rect(Screen.width - Screen.width/5,Screen.height/5,Screen.width/5,Screen.height/5), timer.ToString());
 			GUI.skin.box.fontSize /= 2;
 			if(timer < 1){
-				transform.GetComponent<NetworkManager>().EndRound();
 				timer = countdownTime;
-				PlayerControls.is_gameOn = false;
-				is_menu = true;
-				is_choosingArena = true;
+				gameState = GameState.GameEnd;
+				for(int i = 0; i < Jovios.players.Length; i++){
+					Jovios.SentBasicButtons("Play Again!", "Would you like to play this game again?", Jovios.players[i].networkPlayer);
+				}
+				Transform po = GameObject.Find ("PlayerObjects").transform;
+				for(int i = 0; i < po.childCount; i++){
+					Destroy(po.GetChild(i).gameObject);
+				}
+				Transform mo = GameObject.Find ("Modifiers").transform;
+				for(int i = 0; i < mo.childCount; i++){
+					Destroy(mo.GetChild(i).gameObject);
+				}
 			}
 			else if(lastTickTime + 1 < Time.time){
 				lastTickTime = Time.time;
@@ -113,16 +120,29 @@ public class MenuManager : MonoBehaviour {
 			}
 			if(Application.isWebPlayer){
 				if (GUI.Button(new Rect(Screen.width/2.5F,0,Screen.width/5,Screen.height/20), "Reload Player")){
-					transform.GetComponent<NetworkManager>().NewUrl(Application.absoluteURL);
+					Jovios.NewUrl(Application.absoluteURL);
 				}
 			}
-		}
-		else{
-			if (GUI.Button(new Rect(0,0,Screen.width/10,Screen.height/20), "Menu")){
-				is_menu = true;
+			if (GUI.Button(new Rect(Screen.width/2-Screen.width/20,Screen.height - Screen.height/20,Screen.width/10,Screen.height/20), "Menu")){
+				gameState = GameState.Menu;
+				previousGameState = GameState.GameOn;
 			}
+			break;
+			
+			
+		case GameState.GameEnd:
+			GUI.Box(new Rect(Screen.width - Screen.width/5,0,Screen.width/5,Screen.height/5), "The Winner is " + Jovios.players[GameManager.winner].playerName);
+			break;
+			
+			
+		default:
+			Debug.Log ("Game State Broken");
+			break;
 		}
-		GUI.Box(new Rect(0,Screen.height/20,Screen.width/10,Screen.height/20), NetworkManager.gameName);
+		if (is_loadingNewGame){
+			GUI.Box(new Rect(Screen.width - Screen.width/5,0,Screen.width/5,Screen.height/5), "Loading New Game");
+		}
+		GUI.Box(new Rect(0,Screen.height - Screen.height/8,Screen.width/5,Screen.height/8), "Game Code\n" + Jovios.gameName);
 	}
 		
 	

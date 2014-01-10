@@ -20,8 +20,6 @@ public class Sumo : MonoBehaviour {
 	private NetworkPlayer myPlayer;
 	public int playerNumber;
 	public string playerName;
-	private string playerCharacter;
-	private TextMesh playerCharacterMesh;
 	private Color primary;
 	private Color secondary;
 	
@@ -29,7 +27,7 @@ public class Sumo : MonoBehaviour {
 	public BonusType activeBoost = BonusType.None;
 	public bool is_boostActive = false;
 	public float boostStart;
-	public float boostDuration = 10;
+	public float boostDuration = 5;
 	public Color flashColor = Color.clear;
 	
 	private Transform body;
@@ -44,21 +42,39 @@ public class Sumo : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		body = transform.FindChild("Body");
-		robot = body.FindChild("Robot1").FindChild("Sphere");
 		modifiers = transform.FindChild("Modifiers");
-		hand = transform.FindChild("Hand");
+		GameObject newHand = (GameObject) GameObject.Instantiate(projectile, body.up + body.position, Quaternion.identity);
+		hand = newHand.transform;
 		hand.GetComponent<Projectile>().playerNumber = playerNumber;
+		hand.name = "Hand";
+		hand.parent = transform;
+		hand.localScale = new Vector3(0.3F, 0.3F, 0.3F);
 		speed = 1;
+		robot = body.FindChild("Robot1");
+		for(int i = 0; i < robot.childCount; i++){
+			if(robot.GetChild(i).name == "Sphere_008"){
+				robot.GetChild(i).GetChild(0).renderer.material.color = primary;
+				robot.GetChild(i).GetChild(1).renderer.material.color = primary;
+				robot.GetChild(i).GetChild(2).renderer.material.color = primary;
+			}
+			else if(robot.GetChild(i).name == "Sphere_009"){
+				robot.GetChild(i).GetChild(0).renderer.material.color = secondary;
+				robot.GetChild(i).GetChild(1).renderer.material.color = secondary;
+				robot.GetChild(i).GetChild(2).renderer.material.color = secondary;
+			}
+			else{
+				robot.GetChild(i).renderer.material.color = Color.grey;
+			}
+		}
+		robot = robot.GetChild(13);
 	}
 	
 	void Update () {
-		if(MenuManager.is_choosingArena){
-			hand.particleSystem.enableEmission = false;
+		if(MenuManager.gameState == GameState.ChooseArena){
 			hand.collider.enabled = false;
 			hand.renderer.enabled = false;
 		}
 		else{
-			hand.particleSystem.enableEmission = true;
 			hand.collider.enabled = true;
 			hand.renderer.enabled = true;
 		}
@@ -71,7 +87,6 @@ public class Sumo : MonoBehaviour {
 				defense = 1;
 				flashColor = Color.yellow;
 				body.transform.name = "Body";
-				hand.particleSystem.enableEmission = true;
 				hand.collider.enabled = true;
 				hand.renderer.enabled = true;
 				break;
@@ -83,7 +98,6 @@ public class Sumo : MonoBehaviour {
 				speed = 1;
 				flashColor = Color.white;
 				body.transform.name = "Body";
-				hand.particleSystem.enableEmission = true;
 				hand.collider.enabled = true;
 				hand.renderer.enabled = true;
 				break;
@@ -91,7 +105,6 @@ public class Sumo : MonoBehaviour {
 			case BonusType.Rampage:
 				defense = 3;
 				speed = 1.2F;
-				hand.particleSystem.enableEmission = false;
 				hand.collider.enabled = false;
 				hand.renderer.enabled = false;
 				body.transform.name = "Rampage";
@@ -104,7 +117,6 @@ public class Sumo : MonoBehaviour {
 				range = 1;
 				defense = 1;
 				speed = 1;
-				hand.particleSystem.enableEmission = true;
 				hand.renderer.enabled = true;
 				hand.collider.enabled = true;
 				flashColor = Color.green;
@@ -116,7 +128,6 @@ public class Sumo : MonoBehaviour {
 				strength = 1;
 				defense = 1;
 				speed = 1;
-				hand.particleSystem.enableEmission = true;
 				hand.collider.enabled = true;
 				hand.renderer.enabled = true;
 				flashColor = Color.blue;
@@ -139,7 +150,6 @@ public class Sumo : MonoBehaviour {
 				range = 1;
 				strength = 1;
 				is_boostActive = false;
-				hand.particleSystem.renderer.enabled = true;
 				hand.renderer.enabled = true;
 				hand.collider.enabled = true;
 				body.transform.name = "Body";
@@ -150,33 +160,31 @@ public class Sumo : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		if(!body.GetComponent<SumoCollision>().is_ringOut){	
+		if(!body.GetComponent<SumoCollision>().is_ringOut && (MenuManager.gameState == GameState.ChooseArena || MenuManager.gameState == GameState.GameOn)){	
 			if(body.rigidbody.velocity.magnitude < 1){
 				body.rigidbody.velocity = new Vector3(0, 0, body.rigidbody.velocity.z);
 			}
 			else{
 				body.rigidbody.velocity *= 0.95F;
 			}
-			if(facing != Vector2.zero){
+			if(new Vector2(Jovios.players[playerNumber].right.horizontal, Jovios.players[playerNumber].right.vertical) != Vector2.zero){
 				if(!is_attacking){
 					attackPower++;
 				}
-				if((facing.y > 0)){
-					body.eulerAngles = new Vector3(body.eulerAngles.x, body.eulerAngles.y, - Vector2.Angle(new Vector2(1,0), facing));
+				if((Jovios.players[playerNumber].right.vertical > 0)){
+					body.eulerAngles = new Vector3(body.eulerAngles.x, body.eulerAngles.y, - Vector2.Angle(new Vector2(1,0), new Vector2(Jovios.players[playerNumber].right.horizontal, Jovios.players[playerNumber].right.vertical)));
 				}
 				else{
-					body.eulerAngles = new Vector3(body.eulerAngles.x, body.eulerAngles.y, Vector2.Angle(new Vector2(1,0), facing));
+					body.eulerAngles = new Vector3(body.eulerAngles.x, body.eulerAngles.y, Vector2.Angle(new Vector2(1,0), new Vector2(Jovios.players[playerNumber].right.horizontal, Jovios.players[playerNumber].right.vertical)));
 				}
 			}
 			else if(attackPower > 0 && !is_attacking){
 				Attack();
 			}
-			transform.Translate( new Vector3(speed * movement.y/10, speed * movement.x/10, 0));
+			transform.Translate( new Vector3(speed * Jovios.players[playerNumber].left.vertical/10, speed * Jovios.players[playerNumber].left.horizontal/10, 0));
 			body.rigidbody.angularVelocity = Vector3.zero;
 			float handScale = Mathf.Min (0.5F * strength, (0.4F * attackPower / attackMax + 0.2F) * strength);
 			hand.localScale = new Vector3(handScale, handScale, handScale);
-			hand.particleSystem.startSize = handScale/3;
-			hand.particleSystem.startLifetime = handScale/3;
 			if(is_attacking){
 				hand.GetComponent<Projectile>().facing = body.up;
 				hand.GetComponent<Projectile>().fireDuration = range;
@@ -192,8 +200,6 @@ public class Sumo : MonoBehaviour {
 				hand.name = "Hand";
 				hand.parent = transform;
 				hand.localScale = new Vector3(handScale, handScale, handScale);
-				hand.particleSystem.startSize = handScale/3;
-				hand.particleSystem.startLifetime = handScale/3;
 			}
 			else{
 				hand.position = body.up  + body.position;
@@ -204,22 +210,31 @@ public class Sumo : MonoBehaviour {
 		}
 	}
 	
-	public void SetMyPlayer (int player, Color primaryColor, Color secondaryColor, string newPlayerName){
+	public void SetMyPlayer (Player player){
+		myPlayer = player.networkPlayer;
+		playerNumber = player.playerNumber;
+		primary = player.primary;
+		secondary = player.secondary;
+		playerName = player.playerName;
+		body = transform.FindChild("Body");
 		body.GetComponent<SumoCollision>().startPosition = body.position;
-		myPlayer = NetworkManager.playerList[player];
-		playerNumber = player;
-		primary = primaryColor;
-		secondary = secondaryColor;
-		playerName = newPlayerName;
-		if(newPlayerName.Length>0){
-			playerCharacter = newPlayerName[0].ToString();
+		robot = body.FindChild("Robot1");
+		for(int i = 0; i < robot.childCount; i++){
+			if(robot.GetChild(i).name == "Sphere_008"){
+				robot.GetChild(i).GetChild(0).renderer.material.color = primary;
+				robot.GetChild(i).GetChild(1).renderer.material.color = primary;
+				robot.GetChild(i).GetChild(2).renderer.material.color = primary;
+			}
+			else if(robot.GetChild(i).name == "Sphere_009"){
+				robot.GetChild(i).GetChild(0).renderer.material.color = secondary;
+				robot.GetChild(i).GetChild(1).renderer.material.color = secondary;
+				robot.GetChild(i).GetChild(2).renderer.material.color = secondary;
+			}
+			else{
+				robot.GetChild(i).renderer.material.color = Color.grey;
+			}
 		}
-		else{
-			playerCharacter = "";
-		}
-		robot.renderer.material.color = primary;
-		body.FindChild("Character").GetComponent<TextMesh>().color = secondary;
-		body.FindChild("Character").GetComponent<TextMesh>().text = playerCharacter;
+		robot = robot.GetChild(13);
 	}
 	
 	public void Attack(){
