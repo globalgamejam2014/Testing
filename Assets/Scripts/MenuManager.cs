@@ -28,7 +28,7 @@ public class MenuManager : MonoBehaviour {
 	private bool is_roundStarted = false;
 	
 	void Start(){
-		iPhoneSettings.screenCanDarken = false;
+		//iPhoneSettings.screenCanDarken = false;
 		mainCamera = GameObject.Find ("MainCamera").transform;
 	}
 	
