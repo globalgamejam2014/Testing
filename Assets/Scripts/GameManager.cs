@@ -5,7 +5,7 @@ public class GameManager : MonoBehaviour {
 	
 	private Transform modifiers;
 	public static int[] score;
-	public static int winner = 0;
+	public static int[] winner = new int[] {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 	public static GameObject chosenArena;
 	public static GameObject[] arenas;
 	public GameObject arena1;
@@ -34,15 +34,10 @@ public class GameManager : MonoBehaviour {
 	public static void StartRound(){
 		for(int i = 0; i < Jovios.players.Length; i++){
 			if(Jovios.players[i].statusObject.GetComponent<Status>().is_ready){
-				Jovios.players[i].statusObject.GetComponent<Status>().score.text = "0";
-				Jovios.players[i].statusObject.GetComponent<Status>().score.color = Color.white;
-				Jovios.SentControls(Jovios.players[i].networkPlayer, 0, "Move Character",0, "Move for Direction\nRelease to Fire");
-			}
-			else{
-				Jovios.SentBasicButtons("Waiting for round to complete.", Jovios.players[i].networkPlayer);
+				Jovios.players[i].statusObject.GetComponent<Status>().StartRound();
 			}
 		}
-		score = new int[Jovios.players.Length];
+		score = new int[32];
 		Debug.Log(score[0]);
 	}
 	

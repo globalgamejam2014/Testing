@@ -98,7 +98,7 @@ public class MenuManager : MonoBehaviour {
 				timer = countdownTime;
 				gameState = GameState.GameEnd;
 				for(int i = 0; i < Jovios.players.Length; i++){
-					Jovios.SentBasicButtons("Play Again!", "Would you like to play this game again?", Jovios.players[i].networkPlayer);
+					Jovios.SetBasicButtons("Play Again!", "Would you like to play this game again?", Jovios.players[i].networkPlayer);
 				}
 				Transform po = GameObject.Find ("PlayerObjects").transform;
 				for(int i = 0; i < po.childCount; i++){
@@ -131,7 +131,7 @@ public class MenuManager : MonoBehaviour {
 			
 			
 		case GameState.GameEnd:
-			GUI.Box(new Rect(Screen.width - Screen.width/5,0,Screen.width/5,Screen.height/5), "The Winner is " + Jovios.players[GameManager.winner].playerName);
+			GUI.Box(new Rect(Screen.width - Screen.width/5,0,Screen.width/5,Screen.height/5), "The Winner is " + Jovios.players[GameManager.winner[0]].playerName);
 			break;
 			
 			

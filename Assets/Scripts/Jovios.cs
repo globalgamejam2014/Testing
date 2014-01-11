@@ -5,6 +5,16 @@ using System.Net;
 using System.Net.Sockets;
 using System;
 
+public enum JoviosControls{
+	Joystick,
+	DPad,
+	DiagonalDPad,
+	Button1,
+	Button2,
+	CardinalSwipes,
+	AllInput
+}
+
 public class Player {
 	public GameObject statusObject;
 	public GameObject playerObject;
@@ -38,25 +48,35 @@ public class Player {
 }
 
 public class PlayerInput{
-	public float vertical;
-	public float horizontal;
+	public Vector2 direction;
 	public string button;
 	public PlayerInput(){
-		vertical = 0;
-		horizontal = 0;
+		direction = Vector2.zero;
 		button = "";
 	}
 }
 
 public class Jovios : MonoBehaviour {
+	public static string version = "0.0.0";
 	public static Player[] players;
-	private const string typeName = "AntiConsole";
+	private const string typeName = "Jovios";
 	static public string gameName;
 	public GameObject playerObject;
 	public GameObject statusObject;
 	public static WWW wwwData = null;
 	public static NetworkView thisNetworkView;
 	public static GameObject thisGameObject;
+	[RPC] public void CheckVersion(string controllerVersion){
+		if(controllerVersion == version){
+			Debug.Log ("versions Match");
+		}
+		else if(int.Parse(version.Split('.')[0])<=int.Parse(controllerVersion.Split('.')[0]) && int.Parse(version.Split('.')[1])<=int.Parse(controllerVersion.Split('.')[1]) && int.Parse(version.Split('.')[2])<=int.Parse(controllerVersion.Split('.')[2])){
+			Debug.Log ("controller more advanced version");
+		}
+		else{
+			Debug.Log ("controller out of date");
+		}
+	}
 	
 	void Start(){
 		players = new Player[0];
@@ -133,7 +153,7 @@ public class Jovios : MonoBehaviour {
 		players[players.Length - 1].secondary = Color.clear;
 		players[players.Length - 1].statusObject = (GameObject) GameObject.Instantiate(statusObject, Vector3.zero, Quaternion.identity);
 		players[players.Length - 1].statusObject.SendMessage("SetMyPlayer",players[players.Length - 1], SendMessageOptions.DontRequireReceiver);
-		thisNetworkView.RPC ("SetPlayerNumber", player, players.Length - 1);
+		thisNetworkView.RPC ("SentPlayerNumber", player, players.Length - 1);
 		thisNetworkView.RPC ("PlayerObjectCreated", player);
 	}
 	
@@ -146,11 +166,15 @@ public class Jovios : MonoBehaviour {
 				Destroy (players[i].statusObject);
 			}
 			else{
-				newPlayers[i] = players[nextPlayerNum];
+				newPlayers[nextPlayerNum] = players[i];
+				thisNetworkView.RPC ("SentPlayerNumber", players[i].networkPlayer, nextPlayerNum);
 				nextPlayerNum++;
 			}
 		}
 		players = newPlayers;
+		for(int i = 0; i < players.Length; i++){
+			players[i].statusObject.SendMessage("Reset", i, SendMessageOptions.DontRequireReceiver);
+		}
     	Network.RemoveRPCs(player);
     	Network.DestroyPlayerObjects(player);
     }
@@ -158,49 +182,49 @@ public class Jovios : MonoBehaviour {
 	
 	
 	
-	[RPC] void SentJoystick(int player, float vertical, float horizontal, string side){
+	[RPC] void GetJoystick(int player, float vertical, float horizontal, string side){
 		switch(side){
 		case "left":
-			players[player].left.horizontal = horizontal;
-			players[player].left.vertical = vertical;
+			players[player].left.direction.x = horizontal;
+			players[player].left.direction.y = vertical;
 			break;
 			
 		case "right":
-			players[player].right.horizontal = horizontal;
-			players[player].right.vertical = vertical;
+			players[player].right.direction.x = horizontal;
+			players[player].right.direction.y = vertical;
 			break;
 		}
 	}
-	[RPC] void SentDPad(int player, float vertical, float horizontal, string side){
+	[RPC] void GetDPad(int player, float vertical, float horizontal, string side){
 		switch(side){
 		case "left":
-			players[player].left.horizontal = horizontal;
-			players[player].left.vertical = vertical;
+			players[player].left.direction.x = horizontal;
+			players[player].left.direction.y = vertical;
 			break;
 			
 		case "right":
-			players[player].right.horizontal = horizontal;
-			players[player].right.vertical = vertical;
+			players[player].right.direction.x = horizontal;
+			players[player].right.direction.y = vertical;
 			break;
 		}
 	}
-	[RPC] void SentDiagonalDPad(int player, float vertical, float horizontal, string side){
+	[RPC] void GetDiagonalDPad(int player, float vertical, float horizontal, string side){
 		switch(side){
 		case "left":
-			players[player].left.horizontal = horizontal;
-			players[player].left.vertical = vertical;
+			players[player].left.direction.x = horizontal;
+			players[player].left.direction.y = vertical;
 			break;
 			
 		case "right":
-			players[player].right.horizontal = horizontal;
-			players[player].right.vertical = vertical;
+			players[player].right.direction.x = horizontal;
+			players[player].right.direction.y = vertical;
 			break;
 		}
 	}
 	
 	
 	
-	[RPC] void SentButton1(int playerNumber, string buttonPress, string side){
+	[RPC] void GetButton1(int playerNumber, string buttonPress, string side){
 		switch(side){
 		case "left":
 			if(players[playerNumber].statusObject != null){
@@ -215,7 +239,7 @@ public class Jovios : MonoBehaviour {
 			break;
 		}
 	}
-	[RPC] void SentButton2(int playerNumber, string buttonPress, string side){
+	[RPC] void GetButton2(int playerNumber, string buttonPress, string side){
 		switch(side){
 		case "left":
 			if(players[playerNumber].statusObject != null){
@@ -230,7 +254,7 @@ public class Jovios : MonoBehaviour {
 			break;
 		}
 	}
-	[RPC] void SentButton3Up(int playerNumber, string buttonPress, string side){
+	[RPC] void GetButton3Up(int playerNumber, string buttonPress, string side){
 		switch(side){
 		case "left":
 			if(players[playerNumber].statusObject != null){
@@ -245,7 +269,7 @@ public class Jovios : MonoBehaviour {
 			break;
 		}
 	}
-	[RPC] void SentButton3UpHold(int playerNumber, string buttonPress, float holdTime, string side){
+	[RPC] void GetButton3UpHold(int playerNumber, string buttonPress, float holdTime, string side){
 		switch(side){
 		case "left":
 			if(players[playerNumber].statusObject != null){
@@ -258,6 +282,30 @@ public class Jovios : MonoBehaviour {
 				players[playerNumber].statusObject.SendMessage("OnButton", "Jovios--right--press--" + buttonPress, SendMessageOptions.DontRequireReceiver);
 			}
 			break;
+		}
+	}
+	
+	[RPC] void GetBasicButtonTap(int playerNumber, string button){
+		if(players[playerNumber].statusObject != null){
+			players[playerNumber].statusObject.SendMessage("OnButton", button, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+	
+	[RPC] void GetTextResponse(int playerNumber, string button){
+		if(players[playerNumber].statusObject != null){
+			players[playerNumber].statusObject.SendMessage("OnText", button, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+	
+	[RPC] void GetSingleResponse(int playerNumber, string button){
+		if(players[playerNumber].statusObject != null){
+			players[playerNumber].statusObject.SendMessage("OnButton", button, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+	
+	[RPC] void GetMultiResponse(int playerNumber, string button){
+		if(players[playerNumber].statusObject != null){
+			players[playerNumber].statusObject.SendMessage("OnMulti", button, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 	
@@ -270,49 +318,44 @@ public class Jovios : MonoBehaviour {
 		players[playerNumber].statusObject.SendMessage("SetMyPlayer",players[playerNumber], SendMessageOptions.DontRequireReceiver);
 	}
 	
-	public static void SentControls(NetworkPlayer player, int lControls, string lControlsDescription, int rControls, string rControlsDescription){
-		thisNetworkView.RPC ("SetControls", player, lControls, lControlsDescription, rControls, rControlsDescription);
+	public static void SetControls(NetworkPlayer player, int lControls, string lControlsDescription, int rControls, string rControlsDescription){
+		thisNetworkView.RPC ("SentControls", player, lControls, lControlsDescription, rControls, rControlsDescription);
 	}
 	
-	[RPC] public void SetPlayerNumber(int player){}
-	[RPC] public void SetControls(int lControls, string lControlsDescription, int rControls, string rControlsDescription){}
+	[RPC] public void SentPlayerNumber(int player){}
+	[RPC] public void SentControls(int lControls, string lControlsDescription, int rControls, string rControlsDescription){}
 	[RPC] public void PlayerObjectCreated(){}
 	[RPC] public void EndOfRound(int player){}
 	[RPC] public void NewGame(){}
-	[RPC] void SentBasicButtonTap(int playerNumber, string button){
-		if(players[playerNumber].statusObject != null){
-			players[playerNumber].statusObject.SendMessage("OnButton", button, SendMessageOptions.DontRequireReceiver);
-		}
-	}
 		
-	public static void SentBasicButtons (string question, NetworkPlayer player){
-		thisNetworkView.RPC ("SetButtons", player, "basic", question, "", "", "", "", "", "", "", "", "");
+	public static void SetBasicButtons (string question, NetworkPlayer player){
+		thisNetworkView.RPC ("SentButtons", player, "basic", question, "", "", "", "", "", "", "", "", "");
 	}
-	public static void SentBasicButtons (string button1, string question, NetworkPlayer player){
-		thisNetworkView.RPC ("SetButtons", player, "basic", question,  "", button1, "", "", "", "", "", "", "");
+	public static void SetBasicButtons (string button1, string question, NetworkPlayer player){
+		thisNetworkView.RPC ("SentButtons", player, "basic", question,  "", button1, "", "", "", "", "", "", "");
 	}
-	public static void SentBasicButtons (string button1, string button2, string question, NetworkPlayer player){
-		thisNetworkView.RPC ("SetButtons", player, "basic", question,  "", button1, button2, "", "", "", "", "", "");
+	public static void SetBasicButtons (string button1, string button2, string question, NetworkPlayer player){
+		thisNetworkView.RPC ("SentButtons", player, "basic", question,  "", button1, button2, "", "", "", "", "", "");
 	}
-	public static void SentBasicButtons (string button1, string button2, string button3, string question, NetworkPlayer player){
-		thisNetworkView.RPC ("SetButtons", player, "basic", question,  "", button1, button2, button3, "", "", "", "", "");
+	public static void SetBasicButtons (string button1, string button2, string button3, string question, NetworkPlayer player){
+		thisNetworkView.RPC ("SentButtons", player, "basic", question,  "", button1, button2, button3, "", "", "", "", "");
 	}
-	public static void SentBasicButtons (string button1, string button2, string button3, string button4, string question, NetworkPlayer player){
-		thisNetworkView.RPC ("SetButtons", player, "basic", question,  "", button1, button2, button3, button4, "", "", "", "");
+	public static void SetBasicButtons (string button1, string button2, string button3, string button4, string question, NetworkPlayer player){
+		thisNetworkView.RPC ("SentButtons", player, "basic", question,  "", button1, button2, button3, button4, "", "", "", "");
 	}
-	public static void SentBasicButtons (string button1, string button2, string button3, string button4, string button5, string question, NetworkPlayer player){
-		thisNetworkView.RPC ("SetButtons", player, "basic", question,  "", button1, button2, button3, button4, button5, "", "", "");
+	public static void SetBasicButtons (string button1, string button2, string button3, string button4, string button5, string question, NetworkPlayer player){
+		thisNetworkView.RPC ("SentButtons", player, "basic", question,  "", button1, button2, button3, button4, button5, "", "", "");
 	}
-	public static void SentBasicButtons (string button1, string button2, string button3, string button4, string button5, string button6, string question, NetworkPlayer player){
-		thisNetworkView.RPC ("SetButtons", player, "basic", question,  "", button1, button2, button3, button4, button5, button6, "", "");
+	public static void SetBasicButtons (string button1, string button2, string button3, string button4, string button5, string button6, string question, NetworkPlayer player){
+		thisNetworkView.RPC ("SentButtons", player, "basic", question,  "", button1, button2, button3, button4, button5, button6, "", "");
 	}
-	public static void SentBasicButtons (string button1, string button2, string button3, string button4, string button5, string button6, string button7, string question, NetworkPlayer player){
-		thisNetworkView.RPC ("SetButtons", player, "basic", question,  "", button1, button2, button3, button4, button5, button6, button7, "");
+	public static void SetBasicButtons (string button1, string button2, string button3, string button4, string button5, string button6, string button7, string question, NetworkPlayer player){
+		thisNetworkView.RPC ("SentButtons", player, "basic", question,  "", button1, button2, button3, button4, button5, button6, button7, "");
 	}
-	public static void SentBasicButtons (string button1, string button2, string button3, string button4, string button5, string button6, string button7, string button8, string question, NetworkPlayer player){
-		thisNetworkView.RPC ("SetButtons", player, "basic", question,  "", button1, button2, button3, button4, button5, button6, button7, button8);
+	public static void SetBasicButtons (string button1, string button2, string button3, string button4, string button5, string button6, string button7, string button8, string question, NetworkPlayer player){
+		thisNetworkView.RPC ("SentButtons", player, "basic", question,  "", button1, button2, button3, button4, button5, button6, button7, button8);
 	}
-	[RPC] void SetButtons (string type, string question, string actionWord, string button1, string button2, string button3, string button4, string button5, string button6, string button7, string button8){}
+	[RPC] void SentButtons (string type, string question, string actionWord, string button1, string button2, string button3, string button4, string button5, string button6, string button7, string button8){}
 
 	
 }

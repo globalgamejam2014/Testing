@@ -33,6 +33,7 @@ public class Sumo : MonoBehaviour {
 	private Transform body;
 	private Transform robot;
 	private Transform hand;
+	public Transform crown;
 	public GameObject projectile;
 	private Transform modifiers;
 	
@@ -41,6 +42,7 @@ public class Sumo : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		crown = transform.FindChild("Crown");
 		body = transform.FindChild("Body");
 		modifiers = transform.FindChild("Modifiers");
 		GameObject newHand = (GameObject) GameObject.Instantiate(projectile, body.up + body.position, Quaternion.identity);
@@ -70,6 +72,7 @@ public class Sumo : MonoBehaviour {
 	}
 	
 	void Update () {
+		crown.position = body.position + new Vector3(0,0.1F,-0.5F);
 		if(MenuManager.gameState == GameState.ChooseArena){
 			hand.collider.enabled = false;
 			hand.renderer.enabled = false;
@@ -167,21 +170,21 @@ public class Sumo : MonoBehaviour {
 			else{
 				body.rigidbody.velocity *= 0.95F;
 			}
-			if(new Vector2(Jovios.players[playerNumber].right.horizontal, Jovios.players[playerNumber].right.vertical) != Vector2.zero){
+			if(new Vector2(Jovios.players[playerNumber].right.direction.x, Jovios.players[playerNumber].right.direction.y) != Vector2.zero){
 				if(!is_attacking){
 					attackPower++;
 				}
-				if((Jovios.players[playerNumber].right.vertical > 0)){
-					body.eulerAngles = new Vector3(body.eulerAngles.x, body.eulerAngles.y, - Vector2.Angle(new Vector2(1,0), new Vector2(Jovios.players[playerNumber].right.horizontal, Jovios.players[playerNumber].right.vertical)));
+				if((Jovios.players[playerNumber].right.direction.y > 0)){
+					body.eulerAngles = new Vector3(body.eulerAngles.x, body.eulerAngles.y, - Vector2.Angle(new Vector2(1,0), new Vector2(Jovios.players[playerNumber].right.direction.x, Jovios.players[playerNumber].right.direction.y)));
 				}
 				else{
-					body.eulerAngles = new Vector3(body.eulerAngles.x, body.eulerAngles.y, Vector2.Angle(new Vector2(1,0), new Vector2(Jovios.players[playerNumber].right.horizontal, Jovios.players[playerNumber].right.vertical)));
+					body.eulerAngles = new Vector3(body.eulerAngles.x, body.eulerAngles.y, Vector2.Angle(new Vector2(1,0), new Vector2(Jovios.players[playerNumber].right.direction.x, Jovios.players[playerNumber].right.direction.y)));
 				}
 			}
 			else if(attackPower > 0 && !is_attacking){
 				Attack();
 			}
-			transform.Translate( new Vector3(speed * Jovios.players[playerNumber].left.vertical/10, speed * Jovios.players[playerNumber].left.horizontal/10, 0));
+			transform.Translate( new Vector3(speed * Jovios.players[playerNumber].left.direction.y/10, speed * Jovios.players[playerNumber].left.direction.x/10, 0));
 			body.rigidbody.angularVelocity = Vector3.zero;
 			float handScale = Mathf.Min (0.5F * strength, (0.4F * attackPower / attackMax + 0.2F) * strength);
 			hand.localScale = new Vector3(handScale, handScale, handScale);

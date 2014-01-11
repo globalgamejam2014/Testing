@@ -40,7 +40,7 @@ public class Status : MonoBehaviour {
 		crown.renderer.enabled = false;
 		myPlayer = Jovios.players[Jovios.players.Length - 1].networkPlayer;
 		playerNumber = Jovios.players.Length - 1;
-		Jovios.SentBasicButtons("Join Game", "Ready to Play?", myPlayer);
+		Jovios.SetBasicButtons("Join Game", "Ready to Play?", myPlayer);
 		score.text = "";
 	}
 	
@@ -61,28 +61,37 @@ public class Status : MonoBehaviour {
 		character.color = secondary;
 		character.text = playerCharacter;
 		body.renderer.material.color = primary;
+		if(Jovios.players[playerNumber].playerObject != null){
+			Jovios.players[playerNumber].playerObject.GetComponent<Sumo>().SetMyPlayer(playerInfo);
+		}
 	}
 	
 	private void OnButton(string button){
 		switch(button){
 		case "Join Game":
-			xMark.renderer.enabled = false;
-			checkMark.renderer.enabled = true;
-			if(MenuManager.gameState == GameState.Countdown){
-				Jovios.SentControls(myPlayer, 0, "Move Character", 0, "Move for Direction\nRelease to Fire");
+			switch(MenuManager.gameState){
+			case GameState.Countdown:
+				Ready ();
+				StartRound();
+				break;
+			
+			case GameState.ChooseArena:
+				Ready ();
+				Jovios.SetControls(myPlayer, 0, "Move Character", 3, "SelectLevel");
+				break;
+				
+			case GameState.GameOn:
+				Ready ();
+				StartRound();
+				break;
+				
+			case GameState.GameEnd:
+				Jovios.SetBasicButtons("Play Again!", "Would you like to play this game again?", Jovios.players[playerNumber].networkPlayer);
+				break;
+				
+			case GameState.Menu:
+				break;
 			}
-			else{
-				Jovios.SentControls(myPlayer, 0, "Move Character", 3, "SelectLevel");
-			}
-			if(Jovios.players[playerNumber].playerObject == null){
-				GameObject newPlayerObject = (GameObject) GameObject.Instantiate(playerObject, new Vector3(0,-4,0.5F), Quaternion.identity);
-				newPlayerObject.transform.RotateAround(Vector3.zero, Vector3.forward, 360 - 360 / (playerNumber + 1) * Jovios.players.Length);
-				newPlayerObject.transform.Rotate(new Vector3(0, 0, - 360 + 360 / (playerNumber + 1) * Jovios.players.Length));
-				newPlayerObject.transform.parent = GameObject.Find ("PlayerObjects").transform;
-				newPlayerObject.SendMessage("SetMyPlayer", Jovios.players[playerNumber], SendMessageOptions.DontRequireReceiver);
-				Jovios.players[playerNumber].playerObject = newPlayerObject;
-			}
-			is_ready = true;
 			break;
 			
 		case "Play Again!":
@@ -103,10 +112,37 @@ public class Status : MonoBehaviour {
 	}
 	
 	public void Ready(){
-		
+		xMark.renderer.enabled = false;
+		checkMark.renderer.enabled = true;
+		if(Jovios.players[playerNumber].playerObject == null){
+			GameObject newPlayerObject = (GameObject) GameObject.Instantiate(playerObject, new Vector3(0,-4,0.5F), Quaternion.identity);
+			newPlayerObject.transform.RotateAround(Vector3.zero, Vector3.forward, 360 - 360 / (playerNumber + 1) * Jovios.players.Length);
+			newPlayerObject.transform.Rotate(new Vector3(0, 0, - 360 + 360 / (playerNumber + 1) * Jovios.players.Length));
+			newPlayerObject.transform.parent = GameObject.Find ("PlayerObjects").transform;
+			newPlayerObject.SendMessage("SetMyPlayer", Jovios.players[playerNumber], SendMessageOptions.DontRequireReceiver);
+			Jovios.players[playerNumber].playerObject = newPlayerObject;
+		}
+		is_ready = true;
 	}
 	
 	public void StartRound(){
-		
+		score.text = "0";
+		score.color = Color.white;
+		xMark.renderer.enabled = false;
+		checkMark.renderer.enabled = false;
+		Jovios.SetControls(Jovios.players[playerNumber].networkPlayer, 0, "Move Character",0, "Move for Direction\nRelease to Fire");
+	}
+	
+	public void Reset(int newPlayerNumber){
+		playerNumber = newPlayerNumber;
+		if(Jovios.players[newPlayerNumber].playerObject != null){
+			Jovios.players[newPlayerNumber].playerObject.GetComponent<Sumo>().playerNumber = newPlayerNumber;
+		}
+		if(playerNumber < 4){
+			transform.localPosition = new Vector3(-4.5F + (playerNumber -1) * 4, -1.75F, 0);
+		}
+		else{
+			transform.localPosition = new Vector3(-4.5F + (playerNumber -5) * 4, -3F, 0);
+		}
 	}
 }
