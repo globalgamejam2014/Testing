@@ -121,15 +121,8 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 	void Update () {
 
-		//Activate Powerup - PLACEHOLDER. Need a GetInput from controller.
-		if (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().y > 0.5f && heldPowerup != null) {
-			powerupController.GetComponent<PU_Controller>().ActivatePowerup (heldPowerup, this, false);
-			heldPowerup = null;
-
-		}
-
 		if (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().y < -0.5f) {
-			Debug.Log (runSpeed + " " + runSpeedDefault);
+
 			
 		}
 
@@ -186,7 +179,18 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 				break;
 			}
 			break;
+
+		case "powerup":
+			powerupController.GetComponent<PU_Controller>().ActivatePowerup (heldPowerup, this, false);
+			heldPowerup = null;
+			JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
+			controllerStyle.AddAbsoluteJoystick("left", "Move Character", "Move");
+			controllerStyle.AddButton2("right", new string[] {"Jump"}, new string[] {"Jump"});
+			MenuManager.jovios.SetControls(jUID, controllerStyle);
+			Debug.Log("powerup used");
+			break;
 		default:
+			Debug.Log(e.GetResponse());
 			break;
 		}
 		return false;
