@@ -73,6 +73,12 @@ public class PU_2xspeed_bare : MonoBehaviour {
 
 			playerScript.heldPowerup = powerupType;
 
+			JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
+			controllerStyle.AddAbsoluteJoystick("left", "Move Character", "Move");
+			controllerStyle.AddButton2("right", new string[] {"Jump"}, new string[] {"Jump"});
+			controllerStyle.AddArbitraryButton(new int[] {-2,4,4,4}, powerupType, powerupType);
+			MenuManager.jovios.SetControls(playerScript.jUID, controllerStyle);
+
 			Debug.Log (powerupType);
 
 
