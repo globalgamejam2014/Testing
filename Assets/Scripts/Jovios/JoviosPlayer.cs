@@ -6,9 +6,8 @@ using System.Net.Sockets;
 using System;
 
 public class JoviosPlayer{
-	public JoviosPlayer(int pNumber, JoviosUserID pUserID, NetworkPlayer pNetwork, string pName, Color pPrimary, Color pSecondary){
+	public JoviosPlayer(int pNumber, JoviosUserID pUserID, string pName, Color pPrimary, Color pSecondary){
 		playerNumber = pNumber;
-		networkPlayer = pNetwork;
 		playerName = pName;
 		right = new JoviosInput();
 		left = new JoviosInput();
@@ -17,13 +16,9 @@ public class JoviosPlayer{
 		secondary = pSecondary;
 		userID = pUserID;
 	}
-	public void NewPlayerInfo(int pNumber, JoviosUserID pUserID, NetworkPlayer pNetwork, string pName, Color pPrimary, Color pSecondary){
+	public void NewPlayerInfo(int pNumber, string pName, Color pPrimary, Color pSecondary){
 		playerNumber = pNumber;
-		networkPlayer = pNetwork;
 		playerName = pName;
-		right = new JoviosInput();
-		left = new JoviosInput();
-		accelerometer = new JoviosInput();
 		primary = pPrimary;
 		secondary = pSecondary;
 	}
@@ -69,6 +64,9 @@ public class JoviosPlayer{
 	private NetworkPlayer networkPlayer;
 	public NetworkPlayer GetNetworkPlayer(){
 		return networkPlayer;
+	}
+	public void SetNetworkPlayer(NetworkPlayer np){
+		networkPlayer = np;
 	}
 	private Color primary;
 	private Color secondary;

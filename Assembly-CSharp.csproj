@@ -54,7 +54,9 @@
      <Compile Include="Assets\Scripts\Jovios\JoviosControllerOverallStyle.cs" />
      <Compile Include="Assets\Scripts\Jovios\JoviosControllerStyle.cs" />
      <Compile Include="Assets\Scripts\Jovios\JoviosInput.cs" />
+     <Compile Include="Assets\Scripts\Jovios\JoviosNetworkingState.cs" />
      <Compile Include="Assets\Scripts\Jovios\JoviosPlayer.cs" />
+     <Compile Include="Assets\Scripts\Jovios\JoviosUnityNetworking.cs" />
      <Compile Include="Assets\Scripts\Jovios\JoviosUserID.cs" />
      <Compile Include="Assets\Scripts\MenuManager.cs" />
      <None Include="Assets\crossdomain.xml" />

@@ -10,6 +10,7 @@ public class JoviosButtonEvent {
 		response = buttonIn;
 		style = controllerStyle;
 		side = thisSide;
+		action = actionIn;
 	}
 	private string side;
 	public string GetSide(){
@@ -22,5 +23,9 @@ public class JoviosButtonEvent {
 	private JoviosControllerStyle style;
 	public JoviosControllerStyle GetControllerStyle(){
 		return style;
+	}
+	private string action;
+	public string GetAction(){
+		return action;
 	}
 }

@@ -19,8 +19,10 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControll
 	
 	bool IJoviosPlayerListener.PlayerConnected(JoviosPlayer p){
 		Debug.Log (p.GetPlayerName());
-		JoviosControllerStyle controllerStyle = new JoviosControllerStyle(JoviosControllerOverallStyle.BasicButtons, "What are you doing", new string[] {"this", "that", "whiffle ball bat"}, "go");
-		//JoviosControllerStyle controllerStyle = new JoviosControllerStyle(JoviosControllerAreaStyle.Joystick, "One", JoviosControllerAreaStyle.Joystick, "Two");		
+		JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
+		controllerStyle.AddButton1("left", "Press the button2!", "testButton2");
+		controllerStyle.AddButton2("right", new string[] {"Press the button1!"}, new string[] {"testButton1"});
+		//controllerStyle.SetTextInput("What is your quest?", "Submit");
 		controllerStyle.SetAccelerometerStyle(JoviosControllerAccelerometerStyle.Full);
 		jovios.SetControls(p.GetUserID(), controllerStyle);
 		jovios.AddControllerListener(this);
@@ -36,8 +38,8 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControll
 	}
 	
 	bool IJoviosControllerListener.ButtonEventReceived(JoviosButtonEvent e){
-		Debug.Log (e.GetResponse());
-		Debug.Log (e.GetControllerStyle().GetQuestionPrompt());
+		Debug.Log (e.GetResponse() + e.GetAction());
+		//Debug.Log (e.GetControllerStyle().GetQuestionPrompt());
 		return false;
 	}
 }
