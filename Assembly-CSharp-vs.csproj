@@ -66,6 +66,7 @@
      <Compile Include="Assets\Scripts\Powerups\PU_2xspeed.cs" />
      <Compile Include="Assets\Scripts\Powerups\PU_2xspeed_bare.cs" />
      <Compile Include="Assets\Scripts\Powerups\PU_Controller.cs" />
+     <Compile Include="Assets\Scripts\Projectile.cs" />
      <None Include="Assets\crossdomain.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
