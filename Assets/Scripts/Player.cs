@@ -9,7 +9,7 @@ using System.Collections;
 public class Player : MonoBehaviour, IJoviosControllerListener {
 	
 	private Jovios jovios;
-	private JoviosUserID jUID;
+	public JoviosUserID jUID;
 	private bool is_jumping = false;
 	private float jumpStart;
 	public Transform playerController;							//set as parent of this gameObject

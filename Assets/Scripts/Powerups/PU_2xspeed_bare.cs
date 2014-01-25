@@ -32,6 +32,11 @@ public class PU_2xspeed_bare : MonoBehaviour {
 
 			//double player speed cap
 			playerScript.heldPowerup = "dblSpeed";
+			JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
+			controllerStyle.AddRelativeJoystick("left", "Move Character", "Move");
+			controllerStyle.AddButton2("right", new string[] {"Jump"}, new string[] {"Jump"});
+			controllerStyle.AddArbitraryButton(new int[] {-2, 4, 4, 4}, "Use Power", "dblSpeed");
+			MenuManager.jovios.SetControls(playerScript.jUID, controllerStyle);
 
 			KillPowerUp ();
 
