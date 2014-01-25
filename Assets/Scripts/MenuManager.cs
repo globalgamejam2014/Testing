@@ -21,9 +21,8 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControll
 	bool IJoviosPlayerListener.PlayerConnected(JoviosPlayer p){
 		Debug.Log (p.GetPlayerName());
 		JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
-		controllerStyle.AddRelativeJoystick("left", "Move Character", "Move");
+		controllerStyle.AddAbsoluteJoystick("left", "Move Character", "Move");
 		controllerStyle.AddButton2("right", new string[] {"Jump"}, new string[] {"Jump"});
-		//controllerStyle.SetTextInput("What is your quest?", "Submit");
 		jovios.SetControls(p.GetUserID(), controllerStyle);
 		GameObject gameObject = (GameObject) GameObject.Instantiate(playerObject, Vector3.up, Quaternion.identity);
 
