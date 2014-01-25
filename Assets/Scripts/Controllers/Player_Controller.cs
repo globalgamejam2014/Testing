@@ -21,7 +21,16 @@ public class Player_Controller : MonoBehaviour {
 	}
 
 
+	public static void DecrementLives(int userID) {
 
+		//check the dictionary for the number of lives the player has...
+		private int lastLives = livesList.TryGetValue (userID);
+
+		//remove value, replace with one less
+		livesList.Remove (userID);
+		livesList.Add (userID, lastLives - 1);
+
+	}
 
 
 	public static void UpdateLivesList(int userID) {

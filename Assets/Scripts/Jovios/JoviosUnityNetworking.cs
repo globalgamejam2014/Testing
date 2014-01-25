@@ -42,7 +42,7 @@ public class JoviosUnityNetworking : MonoBehaviour {
 			Application.ExternalCall("GetGameName");
 		}
 		else{
-			SetGameName("bbbb");
+			SetGameName("cccc");
 		}
     } 
 	
