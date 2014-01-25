@@ -5,11 +5,11 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{36ED1CE3-772E-F3DE-3FE9-21977164E909}</ProjectGuid>
+	<ProjectGuid>{8314209F-EE90-FBEC-0009-C48794EE27F5}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
-	<AssemblyName>Assembly-CSharp</AssemblyName>
+	<AssemblyName>Assembly-UnityScript</AssemblyName>
 	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
 	<FileAlignment>512</FileAlignment>
 	<BaseDirectory>Assets</BaseDirectory>
@@ -46,27 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Accelerometer.cs" />
-     <Compile Include="Assets\Scripts\Controllers\Player_Controller.cs" />
-     <Compile Include="Assets\Scripts\Jovios\IJoviosControllerListener.cs" />
-     <Compile Include="Assets\Scripts\Jovios\IJoviosPlayerListener.cs" />
-     <Compile Include="Assets\Scripts\Jovios\Jovios.cs" />
-     <Compile Include="Assets\Scripts\Jovios\JoviosButtonEvent.cs" />
-     <Compile Include="Assets\Scripts\Jovios\JoviosControllerAccelerometerStyle.cs" />
-     <Compile Include="Assets\Scripts\Jovios\JoviosControllerAreaStyle.cs" />
-     <Compile Include="Assets\Scripts\Jovios\JoviosControllerOverallStyle.cs" />
-     <Compile Include="Assets\Scripts\Jovios\JoviosControllerStyle.cs" />
-     <Compile Include="Assets\Scripts\Jovios\JoviosInput.cs" />
-     <Compile Include="Assets\Scripts\Jovios\JoviosNetworkingState.cs" />
-     <Compile Include="Assets\Scripts\Jovios\JoviosPlayer.cs" />
-     <Compile Include="Assets\Scripts\Jovios\JoviosUnityNetworking.cs" />
-     <Compile Include="Assets\Scripts\Jovios\JoviosUserID.cs" />
-     <Compile Include="Assets\Scripts\MenuManager.cs" />
-     <Compile Include="Assets\Scripts\Player.cs" />
-     <Compile Include="Assets\Scripts\Powerups\PU_2xspeed.cs" />
-     <Compile Include="Assets\Scripts\Powerups\PU_2xspeed_bare.cs" />
-     <Compile Include="Assets\Scripts\Powerups\PU_Controller.cs" />
-     <Compile Include="Assets\Scripts\Projectile.cs" />
+     <Compile Include="Assets\Scripts\Camera\Camera_OrthoSizeLock.js" />
      <None Include="Assets\crossdomain.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

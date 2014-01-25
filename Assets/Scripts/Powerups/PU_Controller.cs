@@ -11,18 +11,24 @@ public class PU_Controller : MonoBehaviour {
 	public Transform playerController;
 	public List<Player> playerScripts = new List<Player>();
 	public float powerupDuration;
+	public float powerupTimer = 4;
+	public float powerupPreviousSpawnTime;
+	public GameObject powerupBox;
 
 
 
 	void Start () {
-	
+		powerupPreviousSpawnTime = Time.time;
 		powerupDuration = 5.0F;
 
 	}
 	
 
 	void Update () {
-	
+		if(powerupTimer + powerupPreviousSpawnTime < Time.time){
+			powerupPreviousSpawnTime = Time.time;
+			GameObject.Instantiate(powerupBox, GameObject.Find ("PowerupSpawnLocations").transform.GetChild (Mathf.FloorToInt(GameObject.Find ("PowerupSpawnLocations").transform.childCount * Random.value)).position, Quaternion.identity);
+		}
 
 	}
 
