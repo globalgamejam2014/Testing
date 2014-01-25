@@ -52,7 +52,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 		health = 100.0F;
 		healthDefault = health;
-		jumpSpeed = 40.0F;
+		jumpSpeed = 15.0F;
 		jumpSpeedDefault = jumpSpeed;
 		runSpeed = 5.0F;
 		runSpeedDefault = runSpeed;
@@ -68,7 +68,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		lives = 3;
 		controlsInverted = false;
 		controlsInvertedDefault = controlsInverted;
-		gravityVector = new Vector3(0.0f,-3F,0.0f);
+		gravityVector = new Vector3(0.0f,-0.5F,0.0f);
 		gravityVectorDefault = gravityVector;
 
 		heldPowerup = null;
