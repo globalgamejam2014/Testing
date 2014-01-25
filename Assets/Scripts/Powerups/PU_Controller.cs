@@ -30,10 +30,6 @@ public class PU_Controller : MonoBehaviour {
 	public void ActivatePowerup (string powerup, Player playerScript, bool isPersonal ) {
 
 
-		for (int i = 0 ; i < playerController.childCount ; i++) {
-
-
-		}
 
 		//Apply powerup to all player objects
 		if (!isPersonal) {
@@ -73,9 +69,22 @@ public class PU_Controller : MonoBehaviour {
 				break;
 
 			case "gravityInvert":
+				//inverse gravity
+				for (int i = 0 ; i < playerController.childCount ; i++) {
+					
+					playerScripts[i].gravityVector = -playerScripts[i].gravityVector;
+				}
+
 				break;
 
 			case "controlInvert":
+				//invert the control scheme
+				for (int i = 0 ; i < playerController.childCount ; i++) {
+					
+					playerScripts[i].controlsInverted = true;
+				}
+
+
 				break;
 
 			case "dblFireRate":
@@ -100,9 +109,14 @@ public class PU_Controller : MonoBehaviour {
 				break;
 
 			case "oneHitKills":
+				//set each player's health to 1.
+				for (int i = 0 ; i < playerController.childCount ; i++) {
+					playerScripts[i].health = 1.0F;
+				}
 				break;
 
 			case "activateHazards":
+
 				break;
 
 
@@ -117,6 +131,10 @@ public class PU_Controller : MonoBehaviour {
 	}
 
 
+
+
+
+	//Maintains the list of Player gameObject scripts, so that we don't need to call getComponent every time we want to apply a powerup.
 	public void UpdatePlayerScripts() {
 
 
