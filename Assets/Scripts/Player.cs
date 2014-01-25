@@ -59,7 +59,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		jumpSpeedDefault = jumpSpeed;
 		runSpeed = 5.0F;
 		runSpeedDefault = runSpeed;
-		runAcceleration = 3.0F;
+		runAcceleration = 0.5F;
 		runAccelerationDefault = runAcceleration;
 		projectileFireRate = 1.0F;
 		projectileFireRateDefault = projectileFireRate;
@@ -139,7 +139,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 
 
-	public void takeDamage(float damage) {
+	public void TakeDamage(float damage) {
 
 		health -= damage;
 

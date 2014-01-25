@@ -5,6 +5,7 @@ public class Projectile : MonoBehaviour {
 
 	private Vector2 fireDirection;
 	private float fireSpeed;
+	private float damage = 1;
 
 	// Use this for initialization
 	void Start () {
@@ -26,6 +27,9 @@ public class Projectile : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision collision){
+		if(collision.gameObject.name.Contains ("Player")){
+			collision.gameObject.GetComponent<Player>().TakeDamage(damage);
+		}
 		Destroy(gameObject);
 	}
 }
