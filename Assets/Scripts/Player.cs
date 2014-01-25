@@ -12,8 +12,11 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public JoviosUserID jUID;
 	private bool is_jumping = false;
 	private float jumpStart;
+	private bool is_shooting = false;
+	private float shootStart;
 	public Transform playerController;							//set as parent of this gameObject
 	public Transform powerupController;							//set to powerup controller in inspector
+	public Transform projectile;								//set to projectile
 
 
 
@@ -107,8 +110,14 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		if(is_jumping){
 			rigidbody.AddForce(new Vector3(0,jumpSpeed,0), ForceMode.VelocityChange);
 			//Debug.Log (jumpSpeed);
-
+			
 			is_jumping = false;
+		}
+		//player shooting, this creates a bullet
+		if(is_shooting && shootStart + projectileFireRate < Time.time){
+			GameObject bullet = (GameObject) GameObject.Instantiate(projectile.gameObject, transform.position, Quaternion.identity);
+			bullet.GetComponent<Projectile>().Setup(jovios.GetPlayer(jUID).GetInput("left").GetDirection(), projectileSpeed);
+			shootStart = Time.time;
 		}
 
 	
@@ -119,15 +128,8 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 	void Update () {
 
-		//Activate Powerup - PLACEHOLDER. Need a GetInput from controller.
-		if (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().y > 0.5f && heldPowerup != null) {
-			powerupController.GetComponent<PU_Controller>().ActivatePowerup (heldPowerup, this, false);
-			heldPowerup = null;
-
-		}
-
 		if (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().y < -0.5f) {
-			Debug.Log (runSpeed + " " + runSpeedDefault);
+
 			
 		}
 
@@ -184,7 +186,28 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 				break;
 			}
 			break;
+		case "JumpB":
+			switch(e.GetAction()){
+			case "press":
+				is_shooting = true;
+				break;
+			case "release":
+				is_shooting = false;
+				break;
+			}
+			break;
+
+		case "powerup":
+			powerupController.GetComponent<PU_Controller>().ActivatePowerup (heldPowerup, this, false);
+			heldPowerup = null;
+			JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
+			controllerStyle.AddAbsoluteJoystick("left", "Move Character", "Move");
+			controllerStyle.AddButton2("right", new string[] {"Jump"}, new string[] {"Jump"});
+			MenuManager.jovios.SetControls(jUID, controllerStyle);
+			Debug.Log("powerup used");
+			break;
 		default:
+			Debug.Log(e.GetResponse());
 			break;
 		}
 		return false;
