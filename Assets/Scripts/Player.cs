@@ -34,6 +34,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public float playerSizeDefault;
 
 	public int lives;											//number of lives remaining
+	public int controlMultiplier;								//if controls are normal, should be 1. If inverted, -1.
 
 	public bool controlsInverted;								//are the player's controls inverted?
 	public bool controlsInvertedDefault;
@@ -76,6 +77,15 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	}
 	
 	void FixedUpdate () {
+
+		switch (controlsInverted) {
+		case true: controlMultiplier = -1;
+			break;
+		case false: controlMultiplier = 1;
+			break;
+
+		}
+
 		//check speed proportion, for speed capping purposes
 		speedProportion = (rigidbody.velocity.x) / runSpeed;
 
@@ -84,7 +94,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 		//Player Movement - Running
 		if (Mathf.Abs (speedProportion) < 1) {
-			rigidbody.AddForce (new Vector3 (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().x * runAcceleration, 0, 0), ForceMode.VelocityChange);
+			rigidbody.AddForce (controlMultiplier * new Vector3 (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().x * runAcceleration, 0, 0), ForceMode.VelocityChange);
 		}
 
 		//Cap horizontal movement speed
@@ -125,6 +135,42 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 
 	}
+
+
+
+
+	public void takeDamage(float damage) {
+
+		health -= damage;
+
+
+		if (health < 0) {
+			kill();
+		}
+
+	}
+
+
+	private void kill() {
+
+		Destroy (this.gameObject);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	bool IJoviosControllerListener.ButtonEventReceived(JoviosButtonEvent e){
