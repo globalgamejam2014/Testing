@@ -9,8 +9,8 @@ public class Player_Controller : MonoBehaviour {
 	public static Dictionary<int, int> livesList = new Dictionary<int, int>();
 
 	public static int defaultLives = 3;
-	
-	
+
+
 	void Start () {
 	
 	}
@@ -22,7 +22,21 @@ public class Player_Controller : MonoBehaviour {
 
 
 
+	
+	
+	
+	public static void DecrementLives(int userID) {
+		
+		//check the dictionary for the number of lives the player has...
 
+
+		int lastLives = 3;
+		livesList.TryGetValue (userID, out lastLives);
+		//remove value, replace with one less
+		livesList.Remove (userID);
+		livesList.Add (userID, lastLives - 1);
+		
+	}
 
 	public static void UpdateLivesList(int userID) {
 	

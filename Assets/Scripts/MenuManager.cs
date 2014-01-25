@@ -7,7 +7,6 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControll
 	public GameObject playerObject;
 	public Transform playerController;
 	public Transform powerupController;
-	public Transform projectile;
 	
 	void Start(){
 		jovios = Jovios.Create();
@@ -30,10 +29,10 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControll
 		//Assign new player as child of Player Controller object
 		gameObject.GetComponent<Player> ().playerController = playerController;
 		gameObject.GetComponent<Player> ().powerupController = powerupController;
-		gameObject.GetComponent<Player> ().projectile = projectile;
 
 		gameObject.GetComponent<Player>().PlayerSetup(p);
 		powerupController.GetComponent<PU_Controller>().UpdatePlayerScripts();
+
 
 		return false;
 	}
