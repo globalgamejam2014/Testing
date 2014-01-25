@@ -5,6 +5,8 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControll
 	
 	public static Jovios jovios;
 	public GameObject playerObject;
+	public Transform playerController;
+	public Transform powerupController;
 	
 	void Start(){
 		jovios = Jovios.Create();
@@ -24,7 +26,14 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControll
 		//controllerStyle.SetTextInput("What is your quest?", "Submit");
 		jovios.SetControls(p.GetUserID(), controllerStyle);
 		GameObject gameObject = (GameObject) GameObject.Instantiate(playerObject, Vector3.up, Quaternion.identity);
+
+		//Assign new player as child of Player Controller object
+		gameObject.GetComponent<Player> ().playerController = playerController;
+		gameObject.GetComponent<Player> ().powerupController = powerupController;
+
 		gameObject.GetComponent<Player>().PlayerSetup(p);
+		powerupController.GetComponent<PU_Controller>().UpdatePlayerScripts();
+
 		return false;
 	}
 	bool IJoviosPlayerListener.PlayerUpdated(JoviosPlayer p){
