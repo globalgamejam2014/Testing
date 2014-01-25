@@ -32,8 +32,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public float projectileSpeedDefault;
 	public float playerSize;									//player size; 1 by default
 	public float playerSizeDefault;
-
-	public int lives;											//number of lives remaining
+	
 	public int controlMultiplier;								//if controls are normal, should be 1. If inverted, -1.
 
 	public bool controlsInverted;								//are the player's controls inverted?
@@ -48,8 +47,8 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 
 	void Start () {
-
 	
+		Player_Controller.UpdateLivesList (jUID.GetIDNumber());
 
 		health = 100.0F;
 		healthDefault = health;
@@ -66,7 +65,6 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		playerSize = 1.0F;
 		playerSizeDefault = playerSize;
 
-		lives = 3;
 		controlsInverted = false;
 		controlsInvertedDefault = controlsInverted;
 		gravityVector = new Vector3(0.0f,-0.5F,0.0f);

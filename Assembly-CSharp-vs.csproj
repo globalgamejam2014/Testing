@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Accelerometer.cs" />
+     <Compile Include="Assets\Scripts\Controllers\Player_Controller.cs" />
      <Compile Include="Assets\Scripts\Jovios\IJoviosControllerListener.cs" />
      <Compile Include="Assets\Scripts\Jovios\IJoviosPlayerListener.cs" />
      <Compile Include="Assets\Scripts\Jovios\Jovios.cs" />
