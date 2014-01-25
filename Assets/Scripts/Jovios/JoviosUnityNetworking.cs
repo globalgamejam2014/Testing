@@ -119,7 +119,6 @@ public class JoviosUnityNetworking : MonoBehaviour {
 		jovios.GetPlayer(new JoviosUserID(userID)).GetInput("accelerometer").SetAcceleration(new Vector3(accX, accZ, accY));
 	}
 	[RPC] void GetTextResponse(int userID, string buttonPress, string side = "", string action = ""){
-		Debug.Log ("text");
 		JoviosButtonEvent e = new JoviosButtonEvent(buttonPress, jovios.GetPlayer(new JoviosUserID(userID)).GetControllerStyle(), side, action);
 		foreach(IJoviosControllerListener listener in jovios.GetPlayer(new JoviosUserID(userID)).GetControllerListeners()){
 			if(listener.ButtonEventReceived(e)){
