@@ -10,6 +10,10 @@ public class JoviosControllerStyle{
 	public JoviosControllerAreaStyle GetAreaStyle(string side){
 		return areaStyles[side.ToLower()];
 	}
+	private List<JoviosControllerAreaStyle> arbitraryAreaStyles = new List<JoviosControllerAreaStyle>();
+	public List<JoviosControllerAreaStyle> GetArbitraryAreaStyle(){
+		return arbitraryAreaStyles;
+	}
 	private JoviosControllerOverallStyle overallStyle;
 	public JoviosControllerOverallStyle GetOverallStyle(){
 		return overallStyle;
@@ -18,12 +22,24 @@ public class JoviosControllerStyle{
 		areaStyles.Add(sideRightOrLeft.ToLower(), new JoviosControllerAreaStyle().RelativeJoystick(sideRightOrLeft.ToLower(), description, response));
 		is_splitScreen = true;
 	}
+	public void AddAbsoluteJoystick(string sideRightOrLeft, string description, string response = ""){
+		areaStyles.Add(sideRightOrLeft.ToLower(), new JoviosControllerAreaStyle().AbsoluteJoystick(sideRightOrLeft.ToLower(), description, response));
+		is_splitScreen = true;
+	}
 	public void AddRelativeDPad(string sideRightOrLeft, string description, string response = ""){
 		areaStyles.Add(sideRightOrLeft.ToLower(), new JoviosControllerAreaStyle().RelativeDPad(sideRightOrLeft.ToLower(), description, response));
 		is_splitScreen = true;
 	}
+	public void AddAbsoluteDPad(string sideRightOrLeft, string description, string response = ""){
+		areaStyles.Add(sideRightOrLeft.ToLower(), new JoviosControllerAreaStyle().AbsoluteDPad(sideRightOrLeft.ToLower(), description, response));
+		is_splitScreen = true;
+	}
 	public void AddRelativeDiagonalDPad(string sideRightOrLeft, string description, string response = ""){
 		areaStyles.Add(sideRightOrLeft.ToLower(), new JoviosControllerAreaStyle().RelativeDiagonalDPad(sideRightOrLeft.ToLower(), description, response));
+		is_splitScreen = true;
+	}
+	public void AddAbsoluteDiagonalDPad(string sideRightOrLeft, string description, string response = ""){
+		areaStyles.Add(sideRightOrLeft.ToLower(), new JoviosControllerAreaStyle().AbsoluteDiagonalDPad(sideRightOrLeft.ToLower(), description, response));
 		is_splitScreen = true;
 	}
 	public void AddButton1(string sideRightOrLeft, string description, string response){
@@ -41,6 +57,10 @@ public class JoviosControllerStyle{
 	}
 	public void AddAllTouches(string sideRightOrLeft, string description, string response = ""){
 		areaStyles.Add(sideRightOrLeft.ToLower(), new JoviosControllerAreaStyle().AllTouches(sideRightOrLeft.ToLower(), description, response));
+		is_splitScreen = true;
+	}
+	public void AddArbitraryButton(int[] buttonRect, string description, string response){
+		arbitraryAreaStyles.Add(new JoviosControllerAreaStyle().ArbitraryButton(buttonRect, description, response));
 		is_splitScreen = true;
 	}
 	

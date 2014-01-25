@@ -9,6 +9,14 @@ public class JoviosControllerAreaStyle{
 		areaStyle.type = "RelativeJoystick";
 		return areaStyle;
 	}
+	public JoviosControllerAreaStyle AbsoluteJoystick(string nSide, string nDescription, string nResponse = ""){
+		JoviosControllerAreaStyle areaStyle = new JoviosControllerAreaStyle();
+		areaStyle.side = nSide;
+		areaStyle.description = new string[] {nDescription};
+		areaStyle.response = new string[] {nResponse};
+		areaStyle.type = "AbsoluteJoystick";
+		return areaStyle;
+	}
 	public JoviosControllerAreaStyle RelativeDPad(string nSide, string nDescription, string nResponse = ""){
 		JoviosControllerAreaStyle areaStyle = new JoviosControllerAreaStyle();
 		areaStyle.side = nSide;
@@ -17,12 +25,28 @@ public class JoviosControllerAreaStyle{
 		areaStyle.type = "RelativeDPad";
 		return areaStyle;
 	}
+	public JoviosControllerAreaStyle AbsoluteDPad(string nSide, string nDescription, string nResponse = ""){
+		JoviosControllerAreaStyle areaStyle = new JoviosControllerAreaStyle();
+		areaStyle.side = nSide;
+		areaStyle.description = new string[] {nDescription};
+		areaStyle.response = new string[] {nResponse};
+		areaStyle.type = "AbsoluteDPad";
+		return areaStyle;
+	}
 	public JoviosControllerAreaStyle RelativeDiagonalDPad(string nSide, string nDescription, string nResponse = ""){
 		JoviosControllerAreaStyle areaStyle = new JoviosControllerAreaStyle();
 		areaStyle.side = nSide;
 		areaStyle.description = new string[] {nDescription};
 		areaStyle.response = new string[] {nResponse};
 		areaStyle.type = "RelativeDiagonalDPad";
+		return areaStyle;
+	}
+	public JoviosControllerAreaStyle AbsoluteDiagonalDPad(string nSide, string nDescription, string nResponse = ""){
+		JoviosControllerAreaStyle areaStyle = new JoviosControllerAreaStyle();
+		areaStyle.side = nSide;
+		areaStyle.description = new string[] {nDescription};
+		areaStyle.response = new string[] {nResponse};
+		areaStyle.type = "AbsoluteDiagonalDPad";
 		return areaStyle;
 	}
 	public JoviosControllerAreaStyle Button1(string nSide, string nDescription, string nResponse){
@@ -84,6 +108,18 @@ public class JoviosControllerAreaStyle{
 		areaStyle.response = new string[] {nResponse};
 		areaStyle.type = "AllTouches";
 		return areaStyle;
+	}
+	public JoviosControllerAreaStyle ArbitraryButton(int[] nRect, string nDescription, string nResponse = ""){
+		JoviosControllerAreaStyle areaStyle = new JoviosControllerAreaStyle();
+		areaStyle.rect = nRect;
+		areaStyle.description = new string[] {nDescription};
+		areaStyle.response = new string[] {nResponse};
+		areaStyle.type = "Button";
+		return areaStyle;
+	}
+	private int[] rect;
+	public int[] GetRect(){
+		return rect;
 	}
 	private string type;
 	public string GetAreaType(){

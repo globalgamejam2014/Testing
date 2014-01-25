@@ -42,7 +42,7 @@ public class JoviosUnityNetworking : MonoBehaviour {
 			Application.ExternalCall("GetGameName");
 		}
 		else{
-			SetGameName("aaaa");
+			SetGameName("bbbb");
 		}
     } 
 	
@@ -119,6 +119,7 @@ public class JoviosUnityNetworking : MonoBehaviour {
 		jovios.GetPlayer(new JoviosUserID(userID)).GetInput("accelerometer").SetAcceleration(new Vector3(accX, accZ, accY));
 	}
 	[RPC] void GetTextResponse(int userID, string buttonPress, string side = "", string action = ""){
+		Debug.Log ("text");
 		JoviosButtonEvent e = new JoviosButtonEvent(buttonPress, jovios.GetPlayer(new JoviosUserID(userID)).GetControllerStyle(), side, action);
 		foreach(IJoviosControllerListener listener in jovios.GetPlayer(new JoviosUserID(userID)).GetControllerListeners()){
 			if(listener.ButtonEventReceived(e)){
@@ -141,4 +142,5 @@ public class JoviosUnityNetworking : MonoBehaviour {
 	[RPC] private void EndOfRound(int player){}
 	[RPC] private void NewGame(){}
 	[RPC] private void SentButtons (int accelerometerSetting, string type, string question, string actionWord, string button1, string button2, string button3, string button4, string button5, string button6, string button7, string button8){}
+	[RPC] private void SentArbitraryUIElement(int x, int y, int w, int h, string description, string response){}
 }
