@@ -7,6 +7,8 @@ public class Projectile : MonoBehaviour {
 	private float fireSpeed;
 	private float damage = 1;
 
+	public Transform explosion;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -30,6 +32,19 @@ public class Projectile : MonoBehaviour {
 		if(collision.gameObject.name.Contains ("Player")){
 			collision.gameObject.GetComponent<Player>().TakeDamage(damage);
 		}
+
+		Instantiate (explosion, transform.position, Quaternion.identity);
+
 		Destroy(gameObject);
 	}
+
+	void Update() {
+
+		transform.rotation = Quaternion.FromToRotation (Vector3.right, rigidbody.velocity);
+
+	}
+
+
+
+
 }
