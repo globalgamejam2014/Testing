@@ -215,7 +215,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 		else if (gravityVector.y > 0 && gravityNormal == true) {
 			Vector3 tempVar2 = anim.transform.localScale;
-			tempVar2.y = -1;
+			tempVar2.y *= -1;
 			anim.transform.localScale = tempVar2;
 		}
 
