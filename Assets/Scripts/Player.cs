@@ -17,10 +17,10 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public Transform playerController;							//set as parent of this gameObject
 	public Transform powerupController;							//set to powerup controller in inspector
 	public Transform projectile;								//set to projectile
-
+	
 	public Transform lineRenderer;								//set to line renderer in inspector
-
-
+	
+	
 	//Moddable player attributes - can be changed by powerups
 	public float health;										//Initial (and maximum) player health
 	public float healthDefault;
@@ -38,24 +38,24 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public float playerSizeDefault;
 	
 	public int controlMultiplier;								//if controls are normal, should be 1. If inverted, -1.
-
+	
 	public bool controlsInverted;								//are the player's controls inverted?
 	public bool controlsInvertedDefault;
-
+	
 	public Vector3 gravityVector;								//vector representing direction of gravity on the player
 	public Vector3 gravityVectorDefault;
-
+	
 	public float speedProportion;								//ratio of current horizontal speed to maximum horizontal speed
-
+	
 	public string heldPowerup;									//powerup currently held by the player 
-
+	
 	public Transform lineRendererInstance;
 	public LineRenderer lineRendererComponent;
-
-	void Start () {
 	
+	void Start () {
+		
 		Player_Controller.UpdateLivesList (jUID.GetIDNumber());
-
+		
 		health = 3.0F;
 		healthDefault = health;
 		jumpSpeed = 15.0F;
@@ -70,48 +70,48 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		projectileSpeedDefault = projectileSpeed;
 		playerSize = 1.0F;
 		playerSizeDefault = playerSize;
-
+		
 		controlsInverted = false;
 		controlsInvertedDefault = controlsInverted;
 		gravityVector = new Vector3(0.0f,-0.5F,0.0f);
 		gravityVectorDefault = gravityVector;
-
+		
 		heldPowerup = null;
-
+		
 		lineRendererInstance = Instantiate (lineRenderer, new Vector3(0,0,0), transform.rotation) as Transform;
 		lineRendererComponent = lineRendererInstance.GetComponent<LineRenderer> ();
-
+		
 	}
 	
 	void FixedUpdate () {
-
+		
 		switch (controlsInverted) {
 		case true: controlMultiplier = -1;
 			break;
 		case false: controlMultiplier = 1;
 			break;
-
+			
 		}
-
+		
 		//check speed proportion, for speed capping purposes
 		speedProportion = (rigidbody.velocity.x) / runSpeed;
-
+		
 		//Gravity tick
 		rigidbody.AddForce (gravityVector, ForceMode.VelocityChange);
-
+		
 		//Player Movement - Running
 		if (Mathf.Abs (speedProportion) < 1) {
 			rigidbody.AddForce (controlMultiplier * new Vector3 (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().x * runAcceleration, 0, 0), ForceMode.VelocityChange);
 		}
-
+		
 		//Cap horizontal movement speed
 		if (Mathf.Abs (speedProportion) > 1) {
-			 
+			
 			rigidbody.AddForce(new Vector3(-speedProportion,0,0), ForceMode.VelocityChange);
-
+			
 		}
-
-
+		
+		
 		//Player Movement - Jumping
 		if(is_jumping){
 			rigidbody.AddForce(new Vector3(0,jumpSpeed,0), ForceMode.VelocityChange);
@@ -125,69 +125,69 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 			bullet.GetComponent<Projectile>().Setup(jovios.GetPlayer(jUID).GetInput("left").GetDirection(), projectileSpeed);
 			shootStart = Time.time;
 		}
-
-	
-
+		
+		
+		
 	}
-
-
-
+	
+	
+	
 	void Update () {
-
+		
 		//Update line renderer points
 		//lineRendererInstance
 		lineRendererComponent.SetPosition(0, transform.position);
 		lineRendererComponent.SetPosition (1, transform.position + rigidbody.velocity.normalized);
-
-
+		
+		
 		if (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().y < -0.5f) {
-
+			
 			
 		}
-
-
-
-
+		
+		
+		
+		
 	}
-
-
-
-
+	
+	
+	
+	
 	public void TakeDamage(float damage) {
 		Debug.Log(health);
 		health -= damage;
-
-
+		
+		
 		if (health < 0) {
 			Kill();
 		}
-
+		
 	}
-
-
+	
+	
 	private void Kill() {
 		Player_Controller.DecrementLives(jUID.GetIDNumber());
 		Player_Controller.Respawn(jUID.GetIDNumber(), transform);
 		health = 3;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	bool IJoviosControllerListener.ButtonEventReceived(JoviosButtonEvent e){
 		switch(e.GetResponse()){
 		case "JumpA":
@@ -211,7 +211,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 				break;
 			}
 			break;
-
+			
 		case "powerup":
 			powerupController.GetComponent<PU_Controller>().ActivatePowerup (heldPowerup, this, false);
 			heldPowerup = null;
@@ -234,13 +234,13 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		jovios.AddControllerListener(this, jUID);
 		transform.parent = playerController;
 	}
-
+	
 	void OnTriggerEnter(Collider other){
 		if(other.transform.parent.name == "DamagingObjects"){
 			TakeDamage(1);
 		}
 	}
 	
-
-
+	
+	
 }
