@@ -211,12 +211,14 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 			Vector3 tempVar2 = anim.transform.localScale;
 			tempVar2.y *= -1;
 			anim.transform.localScale = tempVar2;
+			gravityNormal = true;
 		}
 
 		else if (gravityVector.y > 0 && gravityNormal == true) {
 			Vector3 tempVar2 = anim.transform.localScale;
 			tempVar2.y *= -1;
 			anim.transform.localScale = tempVar2;
+			gravityNormal = false;
 		}
 
 		//Update line renderer points
