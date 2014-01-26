@@ -76,7 +76,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 
 		//tint sprite
-		TintSprite ();
+		TintSprite (0);
 
 
 		dblJumpLimit = 2;
@@ -192,6 +192,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	
 	void Update () {
 
+
 		if (rigidbody.velocity.x < 0 && isFacingRight) {
 			isFacingRight = false;
 			Vector3 tempVar = anim.transform.localScale;
@@ -237,7 +238,15 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 			
 		}
 
-		
+		if (isInvincible) {
+
+			TintSprite (.5f);
+
+		}
+		else if(!isInvincible) {
+			TintSprite (1.0f);
+
+		}
 		
 	}
 	
@@ -247,9 +256,11 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public void TakeDamage(float damage) {
 		//Debug.Log(health);
 
+
 		if (!isInvincible) {
 			health -= damage;
 			isInvincible = true;
+			//StartCoroutine(SpriteFlash());
 			StartCoroutine(InvincibilityTimer());
 
 		}
@@ -354,24 +365,27 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	}
 
 
-	void TintSprite() {
+	void TintSprite(float mod) {
+
+		Color modColor = mod * Color.white;
+
 		switch (colorRandInt) {
 
-		case 0: anim.renderer.material.color = Color.cyan;
+		case 0: anim.renderer.material.color = Color.cyan * modColor;
 			break;
-		case 1:	anim.renderer.material.color = Color.green;
+		case 1:	anim.renderer.material.color = Color.green * modColor;
 			break;
-		case 2:	anim.renderer.material.color = Color.blue;
+		case 2:	anim.renderer.material.color = Color.blue * modColor;
 			break;
-		case 3:	anim.renderer.material.color = Color.yellow;
+		case 3:	anim.renderer.material.color = Color.yellow * modColor;
 			break;
-		case 4:	anim.renderer.material.color = Color.magenta;
+		case 4:	anim.renderer.material.color = Color.magenta * modColor;
 			break;
-		case 5:	anim.renderer.material.color = Color.grey;
+		case 5:	anim.renderer.material.color = Color.grey * modColor;
 			break;
-		case 6:	anim.renderer.material.color = Color.white;
+		case 6:	anim.renderer.material.color = Color.white * modColor;
 			break;
-		case 7:	anim.renderer.material.color = Color.black;
+		case 7:	anim.renderer.material.color = Color.black * modColor;
 			break;
 		default:
 			break;
@@ -380,6 +394,12 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 
 	}
+
+	
+
+
+
+
 
 
 
