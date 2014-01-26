@@ -67,6 +67,11 @@ public class Player_Controller : MonoBehaviour {
 
 		}
 
+		if (livesLeft <= 0) {
+
+			Destroy (playerObject.gameObject);
+				
+		}
 
 
 

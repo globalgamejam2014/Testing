@@ -48,14 +48,22 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public string heldPowerup;									//powerup currently held by the player 
 
 	public LineRenderer lineRendererComponent;
-	
+
+	public Animator anim;
+
+	public bool isFacingRight;
+
+	public Transform aimTrajectory;
+
 	void Start () {
-		
+
+		isFacingRight = true;
+
 		Player_Controller.UpdateLivesList (jUID.GetIDNumber());
 		
 		health = 3.0F;
 		healthDefault = health;
-		jumpSpeed = 15.0F;
+		jumpSpeed = 10.0F;
 		jumpSpeedDefault = jumpSpeed;
 		runSpeed = 5.0F;
 		runSpeedDefault = runSpeed;
@@ -74,6 +82,9 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		gravityVectorDefault = gravityVector;
 		
 		heldPowerup = null;
+
+		anim = GetComponentInChildren<Animator> ();
+		 
 
 		gameObject.AddComponent<LineRenderer>();
 		lineRendererComponent = transform.GetComponent<LineRenderer> ();
@@ -130,19 +141,39 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	
 	
 	void Update () {
-		
+
+		if (rigidbody.velocity.x < 0 && isFacingRight) {
+			isFacingRight = false;
+			Vector3 tempVar = anim.transform.localScale;
+			tempVar.x *= -1;
+			anim.transform.localScale = tempVar;
+		}
+
+		else if (rigidbody.velocity.x > 0 && !isFacingRight) {
+			isFacingRight = true;
+			Vector3 tempVar = anim.transform.localScale;
+			tempVar.x *= -1;
+			anim.transform.localScale = tempVar;
+		}
+
+
 		//Update line renderer points
 		//lineRendererInstance
+
+		anim.SetFloat("speedX", Mathf.Abs (rigidbody.velocity.x));
+
 		lineRendererComponent.SetPosition(0, transform.position);
 		lineRendererComponent.SetPosition (1, transform.position + new Vector3(jovios.GetPlayer(jUID).GetInput("left").GetDirection().normalized.x,jovios.GetPlayer(jUID).GetInput("left").GetDirection().normalized.y,0));
-		
+
+		//aimTrajectory.position = transform.position + new Vector3(0,0,-2);
+		//aimTrajectory.rotation = Quaternion.FromToRotation(Vector3.right, new Vector3 (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().normalized.x, jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().normalized.y, 0));
+
 		
 		if (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().y < -0.5f) {
 			
 			
 		}
-		
-		
+
 		
 		
 	}
