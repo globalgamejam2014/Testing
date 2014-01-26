@@ -10,11 +10,12 @@ public class PU_PickupBox : MonoBehaviour {
 	public string powerupType;
 	public string powerupImg;
 	public int numPowerups = 10;
-	
+	public PU_Spawner spawner;
+
 	void Start () {
-		
+	
 		int randInt = Random.Range (0, numPowerups);
-		
+	
 		switch (randInt) {
 			
 		case 0: powerupType = "dblSpeed";
@@ -49,63 +50,64 @@ public class PU_PickupBox : MonoBehaviour {
 			break;
 		default:
 			break;
-			
-			
+
+
 		}
-		
-		
+
+
 	}
-	
+
 	void Update () {
-		
-		
-		
-		
+	
+	
+
+
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 	void OnCollisionEnter (Collision col) {
-		
-		
-		
+
+
+
 		if (col.gameObject.name.Contains ("Player")) {
-			
+
 			Player playerScript = col.gameObject.GetComponent<Player>();
-			
+
 			//double player speed cap
-			
+
 			playerScript.heldPowerup = powerupType;
-			
+
 			JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
 			controllerStyle.AddAbsoluteJoystick("left", "Move Character", "Move");
 			controllerStyle.AddButton2("right", new string[] {"Jump"}, new string[] {"Jump"});
 			controllerStyle.AddArbitraryButton(new int[] {-2,4,4,4}, powerupImg, "powerup");
 			MenuManager.jovios.SetControls(playerScript.jUID, controllerStyle);
-			
+
 			Debug.Log (powerupType);
-			
-			
+
+			spawner.hasPickup = false;
+
 			KillPowerUp ();
-			
-			
-			
-		}
+
+
 		
+		}
+
 	}
 	
-	
-	
+
+
 	void KillPowerUp () {
 		Destroy (this.gameObject);
 	}
 	
-	
-	
-	
+
+
+
 }
