@@ -53,7 +53,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	
 		Player_Controller.UpdateLivesList (jUID.GetIDNumber());
 
-		health = 100.0F;
+		health = 3.0F;
 		healthDefault = health;
 		jumpSpeed = 15.0F;
 		jumpSpeedDefault = jumpSpeed;
@@ -140,20 +140,21 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 
 	public void TakeDamage(float damage) {
-
+		Debug.Log(health);
 		health -= damage;
 
 
 		if (health < 0) {
-			kill();
+			Kill();
 		}
 
 	}
 
 
-	private void kill() {
-
-		Destroy (this.gameObject);
+	private void Kill() {
+		Player_Controller.DecrementLives(jUID.GetIDNumber());
+		Player_Controller.Respawn(jUID.GetIDNumber(), transform);
+		health = 3;
 	}
 
 
@@ -221,8 +222,8 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	}
 
 	void OnTriggerEnter(Collider other){
-		if(collider.transform.parent.name == "DamagingObjects"){
-
+		if(other.transform.parent.name == "DamagingObjects"){
+			TakeDamage(1);
 		}
 	}
 	

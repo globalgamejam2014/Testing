@@ -63,7 +63,7 @@ public class Player_Controller : MonoBehaviour {
 
 		if (livesLeft > 0) {
 
-			playerObject.transform.position = new Vector3(0,0,0);
+			playerObject.transform.position = GameObject.Find ("PlayerSpawnLocations").transform.GetChild (Mathf.FloorToInt(GameObject.Find ("PlayerSpawnLocations").transform.childCount * Random.value)).position;
 
 		}
 

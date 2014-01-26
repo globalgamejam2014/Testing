@@ -24,7 +24,7 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControll
 		controllerStyle.AddAbsoluteJoystick("left", "Move Character", "Move");
 		controllerStyle.AddButton2("right", new string[] {"Jump"}, new string[] {"Jump"});
 		jovios.SetControls(p.GetUserID(), controllerStyle);
-		GameObject gameObject = (GameObject) GameObject.Instantiate(playerObject, Vector3.up, Quaternion.identity);
+		GameObject gameObject = (GameObject) GameObject.Instantiate(playerObject, GameObject.Find ("PlayerSpawnLocations").transform.GetChild (Mathf.FloorToInt(GameObject.Find ("PlayerSpawnLocations").transform.childCount * Random.value)).position, Quaternion.identity);
 
 		//Assign new player as child of Player Controller object
 		gameObject.GetComponent<Player> ().playerController = playerController;
