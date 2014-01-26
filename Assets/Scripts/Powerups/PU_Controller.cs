@@ -26,8 +26,33 @@ public class PU_Controller : MonoBehaviour {
 
 	void Update () {
 		if(powerupTimer + powerupPreviousSpawnTime < Time.time){
-			powerupPreviousSpawnTime = Time.time;
-			GameObject.Instantiate(powerupBox, GameObject.Find ("PowerupSpawnLocations").transform.GetChild (Mathf.FloorToInt(GameObject.Find ("PowerupSpawnLocations").transform.childCount * Random.value)).position, Quaternion.identity);
+
+			//ok we need to spawn a pickup
+
+			GameObject spawnLocs = GameObject.Find("PowerupSpawnLocations");
+
+			PU_Spawner goodSpawner = null;
+			int goodIndex = -1;
+
+			for (int i = 0; i < spawnLocs.transform.childCount; i++) {
+				PU_Spawner candidate = ((PU_Spawner)spawnLocs.transform.GetChild(i).GetComponent("PU_Spawner"));
+
+				if (!candidate.hasPickup && (goodSpawner == null || goodSpawner.lastSpawnedTime < candidate.lastSpawnedTime)) {
+					goodSpawner = candidate;
+					goodIndex = i;
+				}
+			}
+
+			if (goodIndex != -1) {
+				Transform spawner =  GameObject.Find ("PowerupSpawnLocations").transform.GetChild (goodIndex);
+				PU_PickupBox box = (PU_PickupBox)((GameObject)GameObject.Instantiate(powerupBox, spawner.position, Quaternion.identity)).GetComponent("PU_PickupBox");
+				box.spawner = goodSpawner;
+				goodSpawner.lastSpawnedTime = Time.time;
+				goodSpawner.hasPickup = true;
+				//record that we did a spawn
+				powerupPreviousSpawnTime = Time.time;
+			}
+
 		}
 
 	}

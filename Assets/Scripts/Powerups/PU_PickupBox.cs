@@ -9,6 +9,7 @@ public class PU_PickupBox : MonoBehaviour {
 
 	public string powerupType;
 	public int numPowerups = 11;
+	public PU_Spawner spawner;
 
 	void Start () {
 	
@@ -81,6 +82,7 @@ public class PU_PickupBox : MonoBehaviour {
 
 			Debug.Log (powerupType);
 
+			spawner.hasPickup = false;
 
 			KillPowerUp ();
 
