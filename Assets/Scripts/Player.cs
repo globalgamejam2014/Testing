@@ -18,8 +18,6 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public Transform powerupController;							//set to powerup controller in inspector
 	public Transform projectile;								//set to projectile
 	
-	public Transform lineRenderer;								//set to line renderer in inspector
-	
 	
 	//Moddable player attributes - can be changed by powerups
 	public float health;										//Initial (and maximum) player health
@@ -48,8 +46,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public float speedProportion;								//ratio of current horizontal speed to maximum horizontal speed
 	
 	public string heldPowerup;									//powerup currently held by the player 
-	
-	public Transform lineRendererInstance;
+
 	public LineRenderer lineRendererComponent;
 	
 	void Start () {
@@ -77,9 +74,9 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		gravityVectorDefault = gravityVector;
 		
 		heldPowerup = null;
-		
-		lineRendererInstance = Instantiate (lineRenderer, new Vector3(0,0,0), transform.rotation) as Transform;
-		lineRendererComponent = lineRendererInstance.GetComponent<LineRenderer> ();
+
+		gameObject.AddComponent<LineRenderer>();
+		lineRendererComponent = transform.GetComponent<LineRenderer> ();
 		
 	}
 	
@@ -137,7 +134,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		//Update line renderer points
 		//lineRendererInstance
 		lineRendererComponent.SetPosition(0, transform.position);
-		lineRendererComponent.SetPosition (1, transform.position + rigidbody.velocity.normalized);
+		lineRendererComponent.SetPosition (1, transform.position + new Vector3(jovios.GetPlayer(jUID).GetInput("left").GetDirection().normalized.x,jovios.GetPlayer(jUID).GetInput("left").GetDirection().normalized.y,0));
 		
 		
 		if (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().y < -0.5f) {
