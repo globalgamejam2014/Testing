@@ -220,7 +220,11 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		transform.parent = playerController;
 	}
 
+	void OnTriggerEnter(Collider other){
+		if(collider.transform.parent.name == "DamagingObjects"){
 
+		}
+	}
 	
 
 
