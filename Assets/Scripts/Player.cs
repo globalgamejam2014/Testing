@@ -70,14 +70,13 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 	public int dblJumpLimit;
 	public int dblJumpLimitDefault;
-	
+	public int colorRandInt;
 
 	void Start () {
 
 
 		//tint sprite
-
-		//anim.renderer.material.color = Color.cyan;
+		TintSprite ();
 
 
 		dblJumpLimit = 2;
@@ -338,6 +337,10 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		jovios = MenuManager.jovios;
 		jovios.AddControllerListener(this, jUID);
 		transform.parent = playerController;
+
+		//for colorizing
+		colorRandInt = jUID.GetIDNumber () % 8;
+
 	}
 	
 	void OnTriggerStay(Collider other){
@@ -350,5 +353,34 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		dblJumpLimit = dblJumpLimitDefault;
 	}
 
-	
+
+	void TintSprite() {
+		switch (colorRandInt) {
+
+		case 0: anim.renderer.material.color = Color.cyan;
+			break;
+		case 1:	anim.renderer.material.color = Color.green;
+			break;
+		case 2:	anim.renderer.material.color = Color.blue;
+			break;
+		case 3:	anim.renderer.material.color = Color.yellow;
+			break;
+		case 4:	anim.renderer.material.color = Color.magenta;
+			break;
+		case 5:	anim.renderer.material.color = Color.grey;
+			break;
+		case 6:	anim.renderer.material.color = Color.white;
+			break;
+		case 7:	anim.renderer.material.color = Color.black;
+			break;
+		default:
+			break;
+
+		}
+
+
+	}
+
+
+
 }
