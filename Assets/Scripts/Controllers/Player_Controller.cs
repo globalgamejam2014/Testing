@@ -55,7 +55,22 @@ public class Player_Controller : MonoBehaviour {
 	}
 
 
+	public static void Respawn(int userID, Transform playerObject) {
 
+		//check if player has any lives left...
+		int livesLeft = 0;
+		livesList.TryGetValue (userID, out livesLeft);
+
+		if (livesLeft > 0) {
+
+			playerObject.transform.position = new Vector3(0,0,0);
+
+		}
+
+
+
+
+	}
 
 
 
