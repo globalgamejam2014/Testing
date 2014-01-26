@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Accelerometer.cs" />
      <Compile Include="Assets\Scripts\Controllers\Player_Controller.cs" />
+     <Compile Include="Assets\Scripts\ExplosionScript.cs" />
      <Compile Include="Assets\Scripts\Jovios\IJoviosControllerListener.cs" />
      <Compile Include="Assets\Scripts\Jovios\IJoviosPlayerListener.cs" />
      <Compile Include="Assets\Scripts\Jovios\Jovios.cs" />
@@ -67,6 +68,7 @@
      <Compile Include="Assets\Scripts\Powerups\PU_2xspeed_bare.cs" />
      <Compile Include="Assets\Scripts\Powerups\PU_Controller.cs" />
      <Compile Include="Assets\Scripts\Powerups\PU_PickupBox.cs" />
+     <Compile Include="Assets\Scripts\Powerups\PU_Spawner.cs" />
      <Compile Include="Assets\Scripts\Projectile.cs" />
      <None Include="Assets\crossdomain.xml" />
   </ItemGroup>

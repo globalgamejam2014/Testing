@@ -37,7 +37,7 @@ public class PU_Controller : MonoBehaviour {
 			for (int i = 0; i < spawnLocs.transform.childCount; i++) {
 				PU_Spawner candidate = ((PU_Spawner)spawnLocs.transform.GetChild(i).GetComponent("PU_Spawner"));
 
-				if (!candidate.hasPickup && (goodSpawner == null || goodSpawner.lastSpawnedTime < candidate.lastSpawnedTime)) {
+				if (!candidate.hasPickup && (goodSpawner == null || goodSpawner.lastSpawnedTime > candidate.lastSpawnedTime)) {
 					goodSpawner = candidate;
 					goodIndex = i;
 				}
