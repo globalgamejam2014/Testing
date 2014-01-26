@@ -12,6 +12,7 @@ public class ExplosionScript : MonoBehaviour {
 	public float birthTime;
 	public float life;
 
+	public AudioClip explosionSound;
 
 	// Use this for initialization
 	void Start () {
@@ -20,6 +21,9 @@ public class ExplosionScript : MonoBehaviour {
 
 		anim.Play ("Explosion");
 		birthTime = Time.time;
+
+
+		AudioSource.PlayClipAtPoint (explosionSound, transform.position);
 
 	}
 

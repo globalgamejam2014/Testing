@@ -53,7 +53,20 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 	public bool isFacingRight;
 
+	public bool isInvincible;									//check when taking hits, toggle on when hit.
+	public float invincibilityTime;								//duration of invincibility
+
 	public Transform aimTrajectory;
+
+
+	public AudioClip jump1;
+	public AudioClip jump2;
+	public AudioClip fire1;
+	public AudioClip fire2;
+	public AudioClip deathSound;
+	public AudioClip powerup1;
+	public AudioClip powerup2;
+	
 
 	void Start () {
 
@@ -75,7 +88,10 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		projectileSpeedDefault = projectileSpeed;
 		playerSize = 1.0F;
 		playerSizeDefault = playerSize;
-		
+
+		isInvincible = false;
+		invincibilityTime = 1.5F;
+
 		controlsInverted = false;
 		controlsInvertedDefault = controlsInverted;
 		gravityVector = new Vector3(0.0f,-0.5F,0.0f);
@@ -88,6 +104,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 		gameObject.AddComponent<LineRenderer>();
 		lineRendererComponent = transform.GetComponent<LineRenderer> ();
+		lineRendererComponent.enabled = true;
 		
 	}
 	
@@ -123,6 +140,9 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		//Player Movement - Jumping
 		if(is_jumping){
 			rigidbody.AddForce(new Vector3(0,jumpSpeed,0), ForceMode.VelocityChange);
+
+			AudioSource.PlayClipAtPoint(jump1, transform.position);
+
 			//Debug.Log (jumpSpeed);
 			
 			is_jumping = false;
@@ -132,6 +152,18 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 			GameObject bullet = (GameObject) GameObject.Instantiate(projectile.gameObject, transform.position, Quaternion.identity);
 			bullet.GetComponent<Projectile>().Setup(jovios.GetPlayer(jUID).GetInput("left").GetDirection(), projectileSpeed);
 			shootStart = Time.time;
+
+			int randInt = Random.Range (0,2);
+			switch (randInt) {
+				case 0:
+				AudioSource.PlayClipAtPoint(fire1, transform.position);
+				break;
+			case 1:
+				AudioSource.PlayClipAtPoint(fire2, transform.position);
+				break;
+			default:
+				break;
+			}
 		}
 		
 		
@@ -162,9 +194,11 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 		anim.SetFloat("speedX", Mathf.Abs (rigidbody.velocity.x));
 
-		lineRendererComponent.SetPosition(0, transform.position);
-		lineRendererComponent.SetPosition (1, transform.position + new Vector3(jovios.GetPlayer(jUID).GetInput("left").GetDirection().normalized.x,jovios.GetPlayer(jUID).GetInput("left").GetDirection().normalized.y,0));
 
+		if (lineRendererComponent.enabled = true) {
+			lineRendererComponent.SetPosition (0, transform.position);
+			lineRendererComponent.SetPosition (1, transform.position + new Vector3 (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().normalized.x, jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().normalized.y, 0));
+			}
 		//aimTrajectory.position = transform.position + new Vector3(0,0,-2);
 		//aimTrajectory.rotation = Quaternion.FromToRotation(Vector3.right, new Vector3 (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().normalized.x, jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().normalized.y, 0));
 
@@ -182,9 +216,16 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	
 	
 	public void TakeDamage(float damage) {
-		Debug.Log(health);
-		health -= damage;
-		
+		//Debug.Log(health);
+
+		if (!isInvincible) {
+			health -= damage;
+			isInvincible = true;
+			StartCoroutine(InvincibilityTimer());
+
+		}
+
+
 		
 		if (health < 0) {
 			Kill();
@@ -194,13 +235,18 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	
 	
 	private void Kill() {
+		AudioSource.PlayClipAtPoint(deathSound, transform.position);
 		Player_Controller.DecrementLives(jUID.GetIDNumber());
 		Player_Controller.Respawn(jUID.GetIDNumber(), transform);
 		health = 3;
 	}
 	
 	
-	
+	public IEnumerator InvincibilityTimer() {
+		yield return new WaitForSeconds(invincibilityTime);
+		isInvincible = false;
+
+	}
 	
 	
 	
@@ -241,6 +287,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 			break;
 			
 		case "powerup":
+			AudioSource.PlayClipAtPoint(powerup1, transform.position);
 			powerupController.GetComponent<PU_Controller>().ActivatePowerup (heldPowerup, this, false);
 			heldPowerup = null;
 			JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
@@ -263,7 +310,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		transform.parent = playerController;
 	}
 	
-	void OnTriggerEnter(Collider other){
+	void OnTriggerStay(Collider other){
 		if(other.transform.parent.name == "DamagingObjects"){
 			TakeDamage(1);
 		}
