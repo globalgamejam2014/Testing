@@ -52,6 +52,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public Animator anim;
 
 	public bool isFacingRight;
+	public bool gravityNormal;
 
 	public bool isInvincible;									//check when taking hits, toggle on when hit.
 	public float invincibilityTime;								//duration of invincibility
@@ -66,11 +67,24 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public AudioClip deathSound;
 	public AudioClip powerup1;
 	public AudioClip powerup2;
+
+	public int dblJumpLimit;
+	public int dblJumpLimitDefault;
 	
 
 	void Start () {
 
+
+		//tint sprite
+
+		//anim.renderer.material.color = Color.cyan;
+
+
+		dblJumpLimit = 2;
+		dblJumpLimitDefault = dblJumpLimit;
+
 		isFacingRight = true;
+		gravityNormal = true;
 
 		Player_Controller.UpdateLivesList (jUID.GetIDNumber());
 		
@@ -138,14 +152,19 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		
 		
 		//Player Movement - Jumping
-		if(is_jumping){
-			rigidbody.AddForce(new Vector3(0,jumpSpeed,0), ForceMode.VelocityChange);
+		if(is_jumping && dblJumpLimit > 0){
+
+
+			rigidbody.AddForce(new Vector3(0,jumpSpeed * -gravityVector.normalized.y,0), ForceMode.VelocityChange);
 
 			AudioSource.PlayClipAtPoint(jump1, transform.position);
 
 			//Debug.Log (jumpSpeed);
 			
 			is_jumping = false;
+
+			dblJumpLimit -= 1;
+
 		}
 		//player shooting, this creates a bullet
 		if(is_shooting && shootStart + projectileFireRate < Time.time){
@@ -188,6 +207,17 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 			anim.transform.localScale = tempVar;
 		}
 
+		if (gravityVector.y < 0 && gravityNormal == false) {
+			Vector3 tempVar2 = anim.transform.localScale;
+			tempVar2.y *= -1;
+			anim.transform.localScale = tempVar2;
+		}
+
+		else if (gravityVector.y > 0 && gravityNormal == true) {
+			Vector3 tempVar2 = anim.transform.localScale;
+			tempVar2.y = -1;
+			anim.transform.localScale = tempVar2;
+		}
 
 		//Update line renderer points
 		//lineRendererInstance
@@ -315,7 +345,10 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 			TakeDamage(1);
 		}
 	}
-	
-	
+
+	void OnCollisionEnter() {
+		dblJumpLimit = dblJumpLimitDefault;
+	}
+
 	
 }
