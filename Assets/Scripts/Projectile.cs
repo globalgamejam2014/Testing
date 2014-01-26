@@ -37,4 +37,14 @@ public class Projectile : MonoBehaviour {
 
 		Destroy(gameObject);
 	}
+
+	void Update() {
+
+		transform.rotation = Quaternion.FromToRotation (Vector3.right, rigidbody.velocity);
+
+	}
+
+
+
+
 }
