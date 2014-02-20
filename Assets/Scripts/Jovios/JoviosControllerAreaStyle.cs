@@ -1,6 +1,7 @@
 using System;
 
 public class JoviosControllerAreaStyle{
+	//here are the setters for the areas, they need to be updated to support arbitrary areas
 	public JoviosControllerAreaStyle RelativeJoystick(string nSide, string nDescription, string nResponse = ""){
 		JoviosControllerAreaStyle areaStyle = new JoviosControllerAreaStyle();
 		areaStyle.side = nSide;
@@ -109,6 +110,7 @@ public class JoviosControllerAreaStyle{
 		areaStyle.type = "AllTouches";
 		return areaStyle;
 	}
+	//this is the first image supporting and arbitrary area supporting item, other options should be updated to take information like this
 	public JoviosControllerAreaStyle ArbitraryButton(int[] nRect, string nDescription, string nResponse = ""){
 		JoviosControllerAreaStyle areaStyle = new JoviosControllerAreaStyle();
 		areaStyle.rect = nRect;
@@ -117,6 +119,8 @@ public class JoviosControllerAreaStyle{
 		areaStyle.type = "Button";
 		return areaStyle;
 	}
+	// for arbitrary areas this is the rect definitions on the controller screen with the middle point being 0,0 and the top right corner being 12.5,10
+	// wider screens may go up to the top right corner being 16, 10
 	private int[] rect;
 	public int[] GetRect(){
 		return rect;
@@ -125,14 +129,17 @@ public class JoviosControllerAreaStyle{
 	public string GetAreaType(){
 		return type;
 	}
+	//this is only if the split screen is set to a right and left split
 	private string side;
 	public string GetSide(){
 		return side;
 	}
+	//descriptions are the text or image shown on the controller
 	private string[] description;
 	public string[] GetDescription(){
 		return description;
 	}
+	//the response is the text sent back when the button is pressed on the controller
 	private string[] response;
 	public string[] GetResponse(){
 		return response;

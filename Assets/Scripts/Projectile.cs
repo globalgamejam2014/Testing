@@ -11,7 +11,7 @@ public class Projectile : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+		damage = transform.lossyScale.x / 0.2F;
 	}
 
 	void FixedUpdate () {

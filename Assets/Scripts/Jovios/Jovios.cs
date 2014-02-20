@@ -97,7 +97,12 @@ public class Jovios : MonoBehaviour {
 	//This will be called by the connection scripts and will manage player connections
 	public void PlayerConnected(int playerNumber, float primaryR, float primaryG, float primaryB, float secondaryR, float secondaryG, float secondaryB, string playerName, int userID){
 		players.Add(new JoviosPlayer(players.Count, new JoviosUserID(userID), playerName, new Color(primaryR, primaryG, primaryB, 1), new Color(secondaryR, secondaryG, secondaryB, 1)));
-		userIDToPlayerNumber.Add(userID, playerNumber);
+		if(!userIDToPlayerNumber.ContainsKey(userID)){
+			userIDToPlayerNumber.Add(userID, playerNumber);
+		}
+		else{
+			userIDToPlayerNumber[userID] = playerNumber;
+		}
 		if(networkingState == JoviosNetworkingState.Unity){
 			gameObject.GetComponent<JoviosUnityNetworking>().SetNetworkPlayer(playerNumber);
 		}
@@ -120,13 +125,20 @@ public class Jovios : MonoBehaviour {
 	
 	// this will trigger when a player disconnects,
 	public void PlayerDisconnected(JoviosPlayer p){
+		players.Remove(p);
+		userIDToPlayerNumber.Remove(p.GetUserID().GetIDNumber());
+		for(int i = 0; i < userIDToPlayerNumber.Count; i++){
+			userIDToPlayerNumber[GetPlayer(i).GetUserID().GetIDNumber()] = i;
+			players[i].NewPlayerInfo(i, players[i].GetPlayerName(), players[i].GetColor("primary"), players[i].GetColor("secondary"));
+		}
+		for(int i = 0; i < p.PlayerObjectCount(); i++){
+			Destroy(p.GetPlayerObject(i));
+		}
 		foreach(IJoviosPlayerListener listener in playerListeners){
 			if(listener.PlayerDisconnected(p)){
 				break;
 			}
 		}
-		players.Remove(p);
-		userIDToPlayerNumber.Remove(p.GetUserID().GetIDNumber());
     }
 	
 	
@@ -186,14 +198,14 @@ public class Jovios : MonoBehaviour {
 		case JoviosNetworkingState.Unity:
 			GetPlayer(jUID).SetControllerStyle(controllerStyle);
 			if(controllerStyle.IsSplitScreen()){
-				networkView.RPC ("SentControls", GetPlayer(jUID).GetNetworkPlayer(),(int)controllerStyle.GetAccelerometerStyle(), controllerStyle.GetAreaStyle("left").GetAreaType(), controllerStyle.GetAreaStyle("left").GetResponse()[0], controllerStyle.GetAreaStyle("left").GetDescription()[0], controllerStyle.GetAreaStyle("right").GetAreaType(), controllerStyle.GetAreaStyle("right").GetResponse()[0], controllerStyle.GetAreaStyle("right").GetDescription()[0]);
+				networkView.RPC ("SentControls", GetPlayer(jUID).GetNetworkPlayer(),(int)controllerStyle.GetAccelerometerStyle(), controllerStyle.GetAreaStyle("left").GetAreaType(), controllerStyle.GetAreaStyle("left").GetResponse()[0], controllerStyle.GetAreaStyle("left").GetDescription()[0], controllerStyle.GetAreaStyle("right").GetAreaType(), controllerStyle.GetAreaStyle("right").GetResponse()[0], controllerStyle.GetAreaStyle("right").GetDescription()[0], controllerStyle.GetBackgroundImage());
 				foreach(JoviosControllerAreaStyle arbitraryArea in controllerStyle.GetArbitraryAreaStyle()){
 					Debug.Log ("arbitrary set");
 					networkView.RPC ("SentArbitraryUIElement", GetPlayer(jUID).GetNetworkPlayer(), arbitraryArea.GetRect()[0], arbitraryArea.GetRect()[1], arbitraryArea.GetRect()[2], arbitraryArea.GetRect()[3], arbitraryArea.GetDescription()[0], arbitraryArea.GetResponse()[0]);
 				}
 			}
 			else{
-				networkView.RPC ("SentButtons", GetPlayer(jUID).GetNetworkPlayer(),(int)controllerStyle.GetAccelerometerStyle(), controllerStyle.GetOverallStyle().GetOverallType(), controllerStyle.GetOverallStyle().GetQuestionPrompt(),  controllerStyle.GetOverallStyle().GetSubmit(), controllerStyle.GetOverallStyle().GetResponse(0), controllerStyle.GetOverallStyle().GetResponse(1), controllerStyle.GetOverallStyle().GetResponse(2), controllerStyle.GetOverallStyle().GetResponse(3), controllerStyle.GetOverallStyle().GetResponse(4), controllerStyle.GetOverallStyle().GetResponse(5), controllerStyle.GetOverallStyle().GetResponse(6), controllerStyle.GetOverallStyle().GetResponse(7));
+				networkView.RPC ("SentButtons", GetPlayer(jUID).GetNetworkPlayer(),(int)controllerStyle.GetAccelerometerStyle(), controllerStyle.GetOverallStyle().GetOverallType(), controllerStyle.GetOverallStyle().GetQuestionPrompt(),  controllerStyle.GetOverallStyle().GetSubmit(), controllerStyle.GetOverallStyle().GetResponse(0), controllerStyle.GetOverallStyle().GetResponse(1), controllerStyle.GetOverallStyle().GetResponse(2), controllerStyle.GetOverallStyle().GetResponse(3), controllerStyle.GetOverallStyle().GetResponse(4), controllerStyle.GetOverallStyle().GetResponse(5), controllerStyle.GetOverallStyle().GetResponse(6), controllerStyle.GetOverallStyle().GetResponse(7), controllerStyle.GetBackgroundImage());
 			}
 			break;
 			
@@ -209,13 +221,13 @@ public class Jovios : MonoBehaviour {
 			case JoviosNetworkingState.Unity:
 				GetPlayer(jUID).SetControllerStyle(controllerStyle);
 				if(controllerStyle.IsSplitScreen()){
-					networkView.RPC ("SentControls", GetPlayer(jUID).GetNetworkPlayer(),(int)controllerStyle.GetAccelerometerStyle(), controllerStyle.GetAreaStyle("left").GetAreaType(), controllerStyle.GetAreaStyle("left").GetResponse()[0], controllerStyle.GetAreaStyle("left").GetDescription()[0], controllerStyle.GetAreaStyle("right").GetAreaType(), controllerStyle.GetAreaStyle("right").GetResponse()[0], controllerStyle.GetAreaStyle("right").GetDescription()[0]);
+					networkView.RPC ("SentControls", GetPlayer(jUID).GetNetworkPlayer(),(int)controllerStyle.GetAccelerometerStyle(), controllerStyle.GetAreaStyle("left").GetAreaType(), controllerStyle.GetAreaStyle("left").GetResponse()[0], controllerStyle.GetAreaStyle("left").GetDescription()[0], controllerStyle.GetAreaStyle("right").GetAreaType(), controllerStyle.GetAreaStyle("right").GetResponse()[0], controllerStyle.GetAreaStyle("right").GetDescription()[0], controllerStyle.GetBackgroundImage());
 					foreach(JoviosControllerAreaStyle arbitraryArea in controllerStyle.GetArbitraryAreaStyle()){
 						networkView.RPC ("SentArbitraryUIElement", GetPlayer(jUID).GetNetworkPlayer(), arbitraryArea.GetRect()[0], arbitraryArea.GetRect()[1], arbitraryArea.GetRect()[2], arbitraryArea.GetRect()[3], arbitraryArea.GetDescription()[0], arbitraryArea.GetResponse()[0]);
 					}
 				}
 				else{
-					networkView.RPC ("SentButtons", GetPlayer(jUID).GetNetworkPlayer(),(int)controllerStyle.GetAccelerometerStyle(), controllerStyle.GetOverallStyle().GetOverallType(), controllerStyle.GetOverallStyle().GetQuestionPrompt(),  controllerStyle.GetOverallStyle().GetSubmit(), controllerStyle.GetOverallStyle().GetResponse(0), controllerStyle.GetOverallStyle().GetResponse(1), controllerStyle.GetOverallStyle().GetResponse(2), controllerStyle.GetOverallStyle().GetResponse(3), controllerStyle.GetOverallStyle().GetResponse(4), controllerStyle.GetOverallStyle().GetResponse(5), controllerStyle.GetOverallStyle().GetResponse(6), controllerStyle.GetOverallStyle().GetResponse(7));
+					networkView.RPC ("SentButtons", GetPlayer(jUID).GetNetworkPlayer(),(int)controllerStyle.GetAccelerometerStyle(), controllerStyle.GetOverallStyle().GetOverallType(), controllerStyle.GetOverallStyle().GetQuestionPrompt(),  controllerStyle.GetOverallStyle().GetSubmit(), controllerStyle.GetOverallStyle().GetResponse(0), controllerStyle.GetOverallStyle().GetResponse(1), controllerStyle.GetOverallStyle().GetResponse(2), controllerStyle.GetOverallStyle().GetResponse(3), controllerStyle.GetOverallStyle().GetResponse(4), controllerStyle.GetOverallStyle().GetResponse(5), controllerStyle.GetOverallStyle().GetResponse(6), controllerStyle.GetOverallStyle().GetResponse(7), controllerStyle.GetBackgroundImage());
 				}
 				break;
 				

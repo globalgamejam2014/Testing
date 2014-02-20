@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControllerListener{
+public class MenuManager : MonoBehaviour, IJoviosPlayerListener{
 	
 	public static Jovios jovios;
 	public GameObject playerObject;
@@ -19,18 +19,18 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControll
 	}
 	
 	bool IJoviosPlayerListener.PlayerConnected(JoviosPlayer p){
-		Debug.Log (p.GetPlayerName());
 		JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
 		controllerStyle.AddAbsoluteJoystick("left", "Move Character", "Move");
 		controllerStyle.AddButton2("right", new string[] {"Jump"}, new string[] {"Jump"});
 		jovios.SetControls(p.GetUserID(), controllerStyle);
-		GameObject gameObject = (GameObject) GameObject.Instantiate(playerObject, GameObject.Find ("PlayerSpawnLocations").transform.GetChild (Mathf.FloorToInt(GameObject.Find ("PlayerSpawnLocations").transform.childCount * Random.value)).position, Quaternion.identity);
+		GameObject newGameObject = (GameObject) GameObject.Instantiate(playerObject, GameObject.Find ("PlayerSpawnLocations").transform.GetChild (Mathf.FloorToInt(GameObject.Find ("PlayerSpawnLocations").transform.childCount * Random.value)).position, Quaternion.identity);
+		jovios.GetPlayer(p.GetUserID()).AddPlayerObject(newGameObject);
 
 		//Assign new player as child of Player Controller object
-		gameObject.GetComponent<Player> ().playerController = playerController;
-		gameObject.GetComponent<Player> ().powerupController = powerupController;
+		newGameObject.GetComponent<Player> ().playerController = playerController;
+		newGameObject.GetComponent<Player> ().powerupController = powerupController;
 
-		gameObject.GetComponent<Player>().PlayerSetup(p);
+		newGameObject.GetComponent<Player>().PlayerSetup(p);
 		powerupController.GetComponent<PU_Controller>().UpdatePlayerScripts();
 
 
@@ -42,12 +42,6 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener, IJoviosControll
 	}
 	bool IJoviosPlayerListener.PlayerDisconnected(JoviosPlayer p){
 		Debug.Log (p.GetPlayerName());
-		return false;
-	}
-	
-	bool IJoviosControllerListener.ButtonEventReceived(JoviosButtonEvent e){
-		Debug.Log (e.GetResponse() + e.GetAction());
-		//Debug.Log (e.GetControllerStyle().GetQuestionPrompt());
 		return false;
 	}
 }

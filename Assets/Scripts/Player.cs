@@ -34,6 +34,8 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public float projectileSpeedDefault;
 	public float playerSize;									//player size; 1 by default
 	public float playerSizeDefault;
+	public float attackPower;
+	public float attackPowerDefault;
 	
 	public int controlMultiplier;								//if controls are normal, should be 1. If inverted, -1.
 	
@@ -101,6 +103,8 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		projectileSpeedDefault = projectileSpeed;
 		playerSize = 1.0F;
 		playerSizeDefault = playerSize;
+		attackPower = 1.0F;
+		attackPowerDefault = attackPower;
 
 		isInvincible = false;
 		invincibilityTime = 1.5F;
@@ -118,7 +122,11 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		gameObject.AddComponent<LineRenderer>();
 		lineRendererComponent = transform.GetComponent<LineRenderer> ();
 		lineRendererComponent.enabled = true;
-		
+
+		GameObject playerStatus = (GameObject) GameObject.Instantiate(gameObject, new Vector3(-5 + 0.5F * jovios.GetPlayer(jUID).GetPlayerNumber(), -6, -2), Quaternion.identity);
+		playerStatus.collider.enabled = false;
+		playerStatus.GetComponent<Player>().enabled = false;
+		jovios.GetPlayer(jUID).AddPlayerObject(playerStatus);
 	}
 	
 	void FixedUpdate () {
@@ -168,6 +176,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		//player shooting, this creates a bullet
 		if(is_shooting && shootStart + projectileFireRate < Time.time){
 			GameObject bullet = (GameObject) GameObject.Instantiate(projectile.gameObject, transform.position, Quaternion.identity);
+			bullet.transform.localScale = Vector3.one * 0.2F * attackPower;
 			bullet.GetComponent<Projectile>().Setup(jovios.GetPlayer(jUID).GetInput("left").GetDirection(), projectileSpeed);
 			shootStart = Time.time;
 
@@ -221,6 +230,10 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 			gravityNormal = false;
 		}
 
+		if(playerSize * 0.6F != transform.localScale.x){
+			transform.localScale = Vector3.one * 0.6F * playerSize;
+		}
+
 		//Update line renderer points
 		//lineRendererInstance
 
@@ -269,7 +282,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 
 		
-		if (health < 0) {
+		if (health <= 0) {
 			Kill();
 		}
 		

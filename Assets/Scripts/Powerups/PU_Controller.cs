@@ -115,7 +115,7 @@ public class PU_Controller : MonoBehaviour {
 					if (!isPersonal) {
 						for (int i = 0 ; i < playerController.childCount ; i++) {
 							
-							playerScripts[i].jumpSpeed = playerScripts[i].jumpSpeed * 2.0F;
+							playerScripts[i].jumpSpeed = playerScripts[i].jumpSpeed * 0.5F;
 						}
 					}
 
@@ -158,12 +158,12 @@ public class PU_Controller : MonoBehaviour {
 						//double player fire rate
 					if (!isPersonal) {
 						for (int i = 0 ; i < playerController.childCount ; i++) {
-							playerScripts[i].projectileFireRate = playerScripts[i].projectileFireRate * 2.0F;
+							playerScripts[i].projectileFireRate = playerScripts[i].projectileFireRate * 0.5F;
 						}
 					}
 
 					if (isPersonal) {
-						playerScript.projectileFireRate = playerScript.projectileFireRate * 2.0F;
+						playerScript.projectileFireRate = playerScript.projectileFireRate * 0.5F;
 					}
 				break;
 
@@ -197,12 +197,12 @@ public class PU_Controller : MonoBehaviour {
 						//set each player's health to 1.
 					if (!isPersonal) {
 						for (int i = 0 ; i < playerController.childCount ; i++) {
-							playerScripts[i].health = 1.0F;
+							playerScripts[i].attackPower = 3.0F;
 						}
 					}
 
 					if (isPersonal) {
-						playerScript.health = 1.0F;
+						playerScript.attackPower = 3.0F;
 					}
 				break;
 
@@ -322,12 +322,12 @@ public class PU_Controller : MonoBehaviour {
 				//set each player's health to 1.
 				if (!isPersonal) {
 					for (int i = 0 ; i < playerController.childCount ; i++) {
-						playerScripts[i].health = 100.0F;
+						playerScripts[i].attackPower = playerScripts[i].attackPowerDefault;
 					}
 				}
 				
 				if (isPersonal) {
-					playerScript.health = 100.0F;
+					playerScript.attackPower = playerScript.attackPowerDefault;
 				}
 			break;
 			

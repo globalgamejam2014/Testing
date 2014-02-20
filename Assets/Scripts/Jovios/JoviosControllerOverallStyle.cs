@@ -1,6 +1,7 @@
 using System;
 
 public class JoviosControllerOverallStyle{
+	//these are the setters for the overall styles
 	public JoviosControllerOverallStyle BasicButtons(string question, string[] setResponses, string submitButton = ""){
 		JoviosControllerOverallStyle overallStyle = new JoviosControllerOverallStyle();
 		overallStyle.questionPrompt = question;
@@ -52,10 +53,12 @@ public class JoviosControllerOverallStyle{
 	public string GetOverallType(){
 		return type;
 	}
+	//this is the question or prompt displayed at the top of the controller
 	private string questionPrompt;
 	public string GetQuestionPrompt(){
 		return questionPrompt;
 	}
+	//this is an array of up to 8 items that are displayed as individual options or responses.  if text input the option 0 will be the greyed out text
 	private string[] responses = new string[8];
 	public string[] GetResponses(){
 		return responses;
@@ -68,6 +71,7 @@ public class JoviosControllerOverallStyle{
 			return "";
 		}
 	}
+	// this is the submit button for multi, single, numeric, and text inputs options
 	private string submit;
 	public string GetSubmit(){
 		return submit;
