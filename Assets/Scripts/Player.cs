@@ -70,6 +70,8 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	public AudioClip powerup1;
 	public AudioClip powerup2;
 
+	public GameObject scoreText;
+
 	public int dblJumpLimit;
 	public int dblJumpLimitDefault;
 	public int colorRandInt;
@@ -86,8 +88,9 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 		isFacingRight = true;
 		gravityNormal = true;
-
+		
 		Player_Controller.UpdateLivesList (jUID.GetIDNumber());
+		Player_Controller.UpdateScore (jUID.GetIDNumber());
 		
 		health = 3.0F;
 		healthDefault = health;
@@ -122,11 +125,13 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		gameObject.AddComponent<LineRenderer>();
 		lineRendererComponent = transform.GetComponent<LineRenderer> ();
 		lineRendererComponent.enabled = true;
-
+		
 		GameObject playerStatus = (GameObject) GameObject.Instantiate(gameObject, new Vector3(-5 + 0.5F * jovios.GetPlayer(jUID).GetPlayerNumber(), -6, -2), Quaternion.identity);
 		playerStatus.collider.enabled = false;
 		playerStatus.GetComponent<Player>().enabled = false;
 		jovios.GetPlayer(jUID).AddPlayerObject(playerStatus);
+		scoreText = (GameObject) GameObject.Instantiate(scoreText, new Vector3(-5 + 0.5F * jovios.GetPlayer(jUID).GetPlayerNumber(), -6, -2.1F), Quaternion.identity);
+		jovios.GetPlayer(jUID).AddPlayerObject(scoreText);
 	}
 	
 	void FixedUpdate () {
@@ -147,7 +152,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		
 		//Player Movement - Running
 		if (Mathf.Abs (speedProportion) < 1) {
-			rigidbody.AddForce (controlMultiplier * new Vector3 (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().x * runAcceleration, 0, 0), ForceMode.VelocityChange);
+			rigidbody.AddForce (controlMultiplier * new Vector3 (jovios.GetPlayer (jUID).GetControllerStyle().GetDirection  ("left").GetDirection ().x * runAcceleration, 0, 0), ForceMode.VelocityChange);
 		}
 		
 		//Cap horizontal movement speed
@@ -175,9 +180,10 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 		}
 		//player shooting, this creates a bullet
 		if(is_shooting && shootStart + projectileFireRate < Time.time){
-			GameObject bullet = (GameObject) GameObject.Instantiate(projectile.gameObject, transform.position, Quaternion.identity);
+			GameObject bullet = (GameObject) GameObject.Instantiate(projectile.gameObject, transform.position + new Vector3 (jovios.GetPlayer (jUID).GetControllerStyle().GetDirection  ("left").GetDirection ().normalized.x, jovios.GetPlayer (jUID).GetControllerStyle().GetDirection  ("left").GetDirection ().normalized.y, 0), Quaternion.identity);
+			bullet.GetComponent<Projectile>().playerID = jUID.GetIDNumber();
 			bullet.transform.localScale = Vector3.one * 0.2F * attackPower;
-			bullet.GetComponent<Projectile>().Setup(jovios.GetPlayer(jUID).GetInput("left").GetDirection(), projectileSpeed);
+			bullet.GetComponent<Projectile>().Setup(jovios.GetPlayer(jUID).GetControllerStyle().GetDirection ("left").GetDirection(), projectileSpeed);
 			shootStart = Time.time;
 
 			int randInt = Random.Range (0,2);
@@ -242,13 +248,13 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 		if (lineRendererComponent.enabled = true) {
 			lineRendererComponent.SetPosition (0, transform.position);
-			lineRendererComponent.SetPosition (1, transform.position + new Vector3 (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().normalized.x, jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().normalized.y, 0));
+			lineRendererComponent.SetPosition (1, transform.position + new Vector3 (jovios.GetPlayer (jUID).GetControllerStyle().GetDirection ("left").GetDirection ().normalized.x, jovios.GetPlayer (jUID).GetControllerStyle().GetDirection  ("left").GetDirection ().normalized.y, 0));
 			}
 		//aimTrajectory.position = transform.position + new Vector3(0,0,-2);
 		//aimTrajectory.rotation = Quaternion.FromToRotation(Vector3.right, new Vector3 (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().normalized.x, jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().normalized.y, 0));
 
 		
-		if (jovios.GetPlayer (jUID).GetInput ("left").GetDirection ().y < -0.5f) {
+		if (jovios.GetPlayer (jUID).GetControllerStyle().GetDirection ("left").GetDirection ().y < -0.5f) {
 			
 			
 		}
@@ -268,7 +274,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	
 	
 	
-	public void TakeDamage(float damage) {
+	public void TakeDamage(float damage, int hitByPlayer = -1) {
 		//Debug.Log(health);
 
 
@@ -283,13 +289,16 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 		
 		if (health <= 0) {
-			Kill();
+			Kill(hitByPlayer);
 		}
 		
 	}
 	
 	
-	private void Kill() {
+	private void Kill(int killedByPlayer) {
+		if(killedByPlayer > -1){
+			Player_Controller.IncrementScore(killedByPlayer);
+		}
 		AudioSource.PlayClipAtPoint(deathSound, transform.position);
 		Player_Controller.DecrementLives(jUID.GetIDNumber());
 		Player_Controller.Respawn(jUID.GetIDNumber(), transform);
@@ -319,7 +328,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 	
 	bool IJoviosControllerListener.ButtonEventReceived(JoviosButtonEvent e){
 		switch(e.GetResponse()){
-		case "JumpA":
+		case "Jump":
 			switch(e.GetAction()){
 			case "press":
 				is_jumping = true;
@@ -330,7 +339,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 				break;
 			}
 			break;
-		case "JumpB":
+		case "Fire":
 			switch(e.GetAction()){
 			case "press":
 				is_shooting = true;
@@ -345,10 +354,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 			AudioSource.PlayClipAtPoint(powerup1, transform.position);
 			powerupController.GetComponent<PU_Controller>().ActivatePowerup (heldPowerup, this, false);
 			heldPowerup = null;
-			JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
-			controllerStyle.AddAbsoluteJoystick("left", "Move Character", "Move");
-			controllerStyle.AddButton2("right", new string[] {"Jump"}, new string[] {"Jump"});
-			MenuManager.jovios.SetControls(jUID, controllerStyle);
+			MenuManager.jovios.SetControls(jUID, MenuManager.SetControls(ControlStyle.Dragon));
 			Debug.Log("powerup used");
 			break;
 		default:

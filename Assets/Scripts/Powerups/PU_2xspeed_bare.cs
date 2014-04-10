@@ -57,12 +57,7 @@ void OnCollisionEnter (Collision col) {
 		Player playerScript = col.gameObject.GetComponent<Player>();
 		
 		playerScript.heldPowerup = powerupType;
-		
-		JoviosControllerStyle controllerStyle = new JoviosControllerStyle();
-			controllerStyle.AddAbsoluteJoystick("left","Move Character","Move");
-			controllerStyle.AddButton2("right", new string[] {"Jump"}, new string[] {"Jump"});
-			controllerStyle.AddArbitraryButton(new int[] {-2,4,4,4}, powerupType, "powerup");
-		MenuManager.jovios.SetControls(playerScript.jUID, controllerStyle);
+		MenuManager.jovios.SetControls(playerScript.jUID, MenuManager.SetControls(ControlStyle.Powerup));
 		
 		Debug.Log(powerupType);
 		

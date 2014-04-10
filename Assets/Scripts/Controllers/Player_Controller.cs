@@ -7,12 +7,15 @@ public class Player_Controller : MonoBehaviour {
 
 	//Key is the player's jUID.GetIDNumber, Value is the number of lives left.
 	public static Dictionary<int, int> livesList = new Dictionary<int, int>();
+	public static Dictionary<int, int> scores = new Dictionary<int, int>();
 
 	public static int defaultLives = 3;
 
+	private Jovios jovios;
+
 
 	void Start () {
-	
+		jovios = MenuManager.jovios;
 	}
 	
 
@@ -22,14 +25,33 @@ public class Player_Controller : MonoBehaviour {
 
 
 
+	public static void UpdateScore(int userID){
+		if (!scores.ContainsKey (userID)) {
+			scores.Add (userID, 0);
+		}
+	}
 	
+	
+	public static void IncrementScore(int userID) {
+		
+		//check the dictionary for the number of lives the player has...
+		
+		
+		int playerScore = 0;
+		scores.TryGetValue (userID, out playerScore);
+		scores.Remove (userID);
+		scores.Add (userID, playerScore + 1);
+		if(MenuManager.jovios.GetPlayer(new JoviosUserID(userID)).GetPlayerObject(2) != null){
+			MenuManager.jovios.GetPlayer(new JoviosUserID(userID)).GetPlayerObject(2).GetComponent<TextMesh>().text = (playerScore + 1).ToString();
+		}
+	}
 	
 	
 	public static void DecrementLives(int userID) {
 		
 		//check the dictionary for the number of lives the player has...
-
-
+		
+		
 		int lastLives = 3;
 		livesList.TryGetValue (userID, out lastLives);
 		//remove value, replace with one less

@@ -1,9 +1,14 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Jovios\JoviosUnityNetworking.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Powerups\PU_PickupBox.cs">
     <Files>
-      <File FileName="..\GitHub\Sumo\Assets\Scripts\Jovios\JoviosUnityNetworking.cs" Line="42" Column="43" />
-      <File FileName="Assets\Scripts\Jovios\JoviosUnityNetworking.cs" Line="42" Column="42" />
+      <File FileName="..\GitHub\Controller\Assets\Scripts\NetworkManager.cs" Line="313" Column="14" />
+      <File FileName="Assets\Scripts\Jovios\Jovios.cs" Line="4" Column="18" />
+      <File FileName="Assets\Scripts\Accelerometer.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\MenuManager.cs" Line="73" Column="108" />
+      <File FileName="Assets\Scripts\Player.cs" Line="257" Column="64" />
+      <File FileName="Assets\Scripts\Powerups\PU_2xspeed_bare.cs" Line="60" Column="98" />
+      <File FileName="Assets\Scripts\Powerups\PU_PickupBox.cs" Line="95" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
