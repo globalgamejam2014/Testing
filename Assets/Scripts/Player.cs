@@ -121,8 +121,6 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 
 		anim = GetComponentInChildren<Animator> ();
 		 
-
-		gameObject.AddComponent<LineRenderer>();
 		lineRendererComponent = transform.GetComponent<LineRenderer> ();
 		lineRendererComponent.enabled = true;
 		
@@ -354,7 +352,7 @@ public class Player : MonoBehaviour, IJoviosControllerListener {
 			AudioSource.PlayClipAtPoint(powerup1, transform.position);
 			powerupController.GetComponent<PU_Controller>().ActivatePowerup (heldPowerup, this, false);
 			heldPowerup = null;
-			MenuManager.jovios.SetControls(jUID, MenuManager.SetControls(ControlStyle.Dragon));
+			MenuManager.jovios.SetControls(jUID, "Dragon");
 			Debug.Log("powerup used");
 			break;
 		default:

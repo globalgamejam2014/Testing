@@ -16,19 +16,20 @@ public class MenuManager : MonoBehaviour, IJoviosPlayerListener{
 	public Transform playerController;
 	public Transform powerupController;
 	public Dictionary<string, JoviosControllerStyle> controls = new Dictionary<string, JoviosControllerStyle>();
+	public List<GameObject> controlStyles = new List<GameObject>();
 	
 	void Start(){
 		jovios = Jovios.Create();
 		jovios.AddPlayerListener(this);
-		jovios.StartServer();
+		jovios.StartServer(controlStyles, new List<Texture2D>(), "Wizard Lizards");
 	}
 	
 	void OnGUI(){
-		GUI.Box(new Rect(0,0,100,50), jovios.gameCode.ToString());
+		GUI.Box(new Rect(0,0,100,50), jovios.gameCode);
 	}
 	
 	bool IJoviosPlayerListener.PlayerConnected(JoviosPlayer p){
-		jovios.SetControls(p.GetUserID(), SetControls(ControlStyle.Dragon));
+		jovios.SetControls(p.GetUserID(), "Dragon");
 		GameObject newGameObject = (GameObject) GameObject.Instantiate(playerObject, GameObject.Find ("PlayerSpawnLocations").transform.GetChild (Mathf.FloorToInt(GameObject.Find ("PlayerSpawnLocations").transform.childCount * Random.value)).position, Quaternion.identity);
 		jovios.GetPlayer(p.GetUserID()).AddPlayerObject(newGameObject);
 
